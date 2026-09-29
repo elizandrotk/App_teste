@@ -1,1 +1,143 @@
 
+:root {
+    --bg-primary: #f4f1ea;
+    --btn-primary: #8b5cf6;
+    --text-color: #333333;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    transition: background-color 0.3s ease;
+}
+
+/* Painel de Cores */
+.color-panel {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Estrutura do Roupeiro */
+.wardrobe {
+    position: relative;
+    background-color: #ffffff;
+    border: 3px solid #d1d5db;
+    border-radius: 12px;
+    min-height: 500px;
+    padding: 20px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Portas do Guarda-Roupa */
+.doors {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #5c3a21;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: opacity 0.5s ease;
+}
+
+.main-btn, .custom-file-upload {
+    background-color: var(--btn-primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.custom-file-upload {
+    display: inline-block;
+}
+
+/* Layout Interno */
+.wardrobe-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .wardrobe-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Palco / Provador */
+.stage-canvas {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fafafa;
+}
+
+.person-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Peças de roupa sobrepostas no corpo */
+.overlay-item {
+    position: absolute;
+    width: 120px;
+    cursor: move;
+    user-select: none;
+}
+
+/* Lista de peças no guarda-roupa */
+.clothing-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.clothing-thumb {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid #ddd;
+    cursor: pointer;
+}
+
+.clothing-thumb:hover {
+    border-color: var(--btn-primary);
+}
+
+/* Utilitários */
+.hidden {
+    display: none !important;
+}
