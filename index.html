@@ -186,12 +186,12 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
-                <p class="text-sm text-slate-500">Gerenciamento Completo de Roupas e Categorias</p>
+                <p class="text-sm text-slate-500">Com Banco de Dados Local (localStorage)</p>
             </div>
         </div>
         
-        <!-- PAINEL DE CORES -->
-        <div class="flex items-center gap-4 bg-white p-3 rounded-full shadow-inner border border-slate-100">
+        <!-- PAINEL DE CORES E RESTAURAÇÃO -->
+        <div class="flex items-center gap-4 bg-white p-3 rounded-full shadow-inner border border-slate-100 flex-wrap justify-center">
             <div class="flex items-center gap-2">
                 <label for="bg-color" class="text-xs font-semibold text-slate-500">Fundo:</label>
                 <input type="color" id="bg-color" value="#f4f1ea">
@@ -200,6 +200,9 @@
                 <label for="btn-color" class="text-xs font-semibold text-slate-500">Botões:</label>
                 <input type="color" id="btn-color" value="#8b5cf6">
             </div>
+            <button id="btn-reset-database" title="Restaurar dados padrões de fábrica" class="text-xs text-red-500 hover:text-red-700 font-semibold px-2 border-l border-slate-200">
+                <i class="fa-solid fa-rotate-left"></i> Resetar BD
+            </button>
         </div>
     </header>
 
@@ -218,7 +221,7 @@
                         <i class="fa-solid fa-door-closed"></i>
                     </div>
                     <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
-                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Gerencie seu guarda-roupa, crie e remova categorias ou faça uma limpeza completa para começar do zero.</p>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Suas peças e combinações ficam salvas no seu navegador automaticamente.</p>
                     <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
                         <i class="fa-solid fa-door-open"></i>
                         Abrir Guarda-Roupa
@@ -312,7 +315,7 @@
                                 <label class="text-[11px] font-semibold text-slate-500">Estação:</label>
                                 <select id="new-season" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
                                     <option value="todas">Todas</option>
-                                    <option value="Verão ☀️">Verão ☀</option>
+                                    <option value="Verão ☀️">Verão ☀️</option>
                                     <option value="Outono 🍂">Outono 🍂</option>
                                     <option value="Inverno ❄">Inverno ❄</option>
                                     <option value="Primavera 🌸">Primavera 🌸</option>
@@ -391,7 +394,7 @@
     </main>
 
     <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v8.2 | Ação de Limpeza Completa do Provador
+        Provador Virtual v9.0 | Com Banco de Dados Local Ativo (localStorage)
     </footer>
 
     <!-- JAVASCRIPT -->
@@ -405,7 +408,7 @@
             {
                 id: 1,
                 src: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Blue_T-shirt.png',
-                season: 'Verão ☀',
+                season: 'Verão ☀️',
                 event: 'Casual'
             },
             {
@@ -422,7 +425,16 @@
             }
         ];
 
-        let clothesDatabase = [...demoClothes];
+        // GESTÃO DE LOCALSTORAGE
+        let clothesDatabase = JSON.parse(localStorage.getItem('pv_clothesDatabase')) || [...demoClothes];
+        let savedProfiles = JSON.parse(localStorage.getItem('pv_savedProfiles')) || [];
+        let customCategories = JSON.parse(localStorage.getItem('pv_customCategories')) || { seasons: [], events: [] };
+
+        function saveToStorage() {
+            localStorage.setItem('pv_clothesDatabase', JSON.stringify(clothesDatabase));
+            localStorage.setItem('pv_savedProfiles', JSON.stringify(savedProfiles));
+            localStorage.setItem('pv_customCategories', JSON.stringify(customCategories));
+        }
 
         // CORES
         const bgColorInput = document.getElementById('bg-color');
@@ -436,6 +448,14 @@
             const newColor = e.target.value;
             document.documentElement.style.setProperty('--btn-primary', newColor);
             document.documentElement.style.setProperty('--btn-primary-hover', newColor + 'dd'); 
+        });
+
+        // RESET BANCO DE DADOS
+        document.getElementById('btn-reset-database').addEventListener('click', () => {
+            if (confirm('Atenção: Isso redefinirá todo o banco de dados local para os padrões originais. Deseja continuar?')) {
+                localStorage.clear();
+                location.reload();
+            }
         });
 
         // GUARDA-ROUPA
@@ -482,6 +502,26 @@
         const btnDeleteSeasonCat = document.getElementById('btn-delete-season-cat');
         const btnDeleteEventCat = document.getElementById('btn-delete-event-cat');
 
+        function loadSavedCategories() {
+            customCategories.seasons.forEach(catName => {
+                if (!Array.from(newSeasonSelect.options).some(opt => opt.value === catName)) {
+                    const opt = document.createElement('option');
+                    opt.value = catName;
+                    opt.textContent = catName;
+                    newSeasonSelect.appendChild(opt);
+                }
+            });
+
+            customCategories.events.forEach(catName => {
+                if (!Array.from(newEventSelect.options).some(opt => opt.value === catName)) {
+                    const opt = document.createElement('option');
+                    opt.value = catName;
+                    opt.textContent = catName;
+                    newEventSelect.appendChild(opt);
+                }
+            });
+        }
+
         function updateFilterSelects() {
             const currentSeasonFilter = filterSeason.value;
             const currentEventFilter = filterEvent.value;
@@ -520,10 +560,13 @@
 
             if (type === 'season') {
                 newSeasonSelect.appendChild(option);
+                if (!customCategories.seasons.includes(name)) customCategories.seasons.push(name);
             } else {
                 newEventSelect.appendChild(option);
+                if (!customCategories.events.includes(name)) customCategories.events.push(name);
             }
 
+            saveToStorage();
             updateFilterSelects();
             newCategoryName.value = '';
         });
@@ -539,6 +582,8 @@
                 Array.from(newSeasonSelect.options).forEach(opt => {
                     if (opt.value === selectedVal) opt.remove();
                 });
+                customCategories.seasons = customCategories.seasons.filter(c => c !== selectedVal);
+                saveToStorage();
                 updateFilterSelects();
                 renderClothesList();
             }
@@ -555,11 +600,14 @@
                 Array.from(newEventSelect.options).forEach(opt => {
                     if (opt.value === selectedVal) opt.remove();
                 });
+                customCategories.events = customCategories.events.filter(c => c !== selectedVal);
+                saveToStorage();
                 updateFilterSelects();
                 renderClothesList();
             }
         });
 
+        loadSavedCategories();
         updateFilterSelects();
 
         // RENDERIZAÇÃO E PEÇAS
@@ -569,7 +617,7 @@
         const btnClearCanvas = document.getElementById('btn-clear-canvas');
         const btnClearAllClothes = document.getElementById('btn-clear-all-clothes');
 
-        // BOTÃO LIMPAR PROVADOR (RESTAURAÇÃO COMPLETA)
+        // BOTÃO LIMPAR PROVADOR
         btnClearCanvas.addEventListener('click', () => {
             overlayContainer.innerHTML = '';
             personImg.src = '';
@@ -582,6 +630,7 @@
         btnClearAllClothes.addEventListener('click', () => {
             if (confirm('Tem certeza que deseja apagar TODAS as roupas do guarda-roupa?')) {
                 clothesDatabase = [];
+                saveToStorage();
                 overlayContainer.innerHTML = '';
                 personImg.src = '';
                 personImg.classList.add('hidden');
@@ -605,6 +654,7 @@
                     };
 
                     clothesDatabase.push(newItem);
+                    saveToStorage();
                     renderClothesList();
                 };
                 reader.readAsDataURL(file);
@@ -613,6 +663,7 @@
 
         function removeSingleClothing(id) {
             clothesDatabase = clothesDatabase.filter(item => item.id !== id);
+            saveToStorage();
             renderClothesList();
         }
 
@@ -684,6 +735,7 @@
             wrapper.style.width = width + 'px';
             wrapper.style.height = height + 'px';
             wrapper.dataset.rotation = rotation;
+            if (rotation) wrapper.style.transform = `rotate(${rotation}deg)`;
 
             const img = document.createElement('img');
             img.src = src;
@@ -907,7 +959,6 @@
         });
 
         // PERFIS DE LOOKS
-        let savedProfiles = [];
         const profileNameInput = document.getElementById('profile-name-input');
         const btnSaveProfile = document.getElementById('btn-save-profile');
         const savedProfilesList = document.getElementById('saved-profiles-list');
@@ -942,6 +993,7 @@
             };
 
             savedProfiles.push(profile);
+            saveToStorage();
             profileNameInput.value = '';
             renderSavedProfiles();
         });
@@ -994,8 +1046,11 @@
 
         function deleteProfile(id) {
             savedProfiles = savedProfiles.filter(p => p.id !== id);
+            saveToStorage();
             renderSavedProfiles();
         }
+
+        renderSavedProfiles();
     </script>
 </body>
 </html>
