@@ -204,9 +204,12 @@
                         <p class="text-xs text-slate-500 max-w-xs mb-4">Toque aqui para escolher uma foto do celular ou computador para testar as roupas.</p>
                         <span class="py-2.5 px-4 rounded-xl btn-theme-primary font-semibold text-xs shadow-md transition inline-flex items-center gap-2">
                             <i class="fa-solid fa-image"></i>
-                            <span>Selecionar Foto</span>
-                        </span>
-                         <input type="file" id="input-clothing-file" accept="image/*" class="hidden">
+                      <div>
+                        <button id="btn-trigger-add-clothing" class="w-full py-3 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-dashed border-purple-300 text-purple-700 transition flex items-center justify-center gap-2 text-xs font-bold cursor-pointer">
+                            <i class="fa-solid fa-circle-plus text-sm"></i>
+                            <span>Adicionar Peça do Celular/PC</span>
+                        </button>
+                        <input type="file" id="input-clothing-file" accept="image/*" class="hidden">
                     </div>
 
                     <!-- Base Person Image -->
