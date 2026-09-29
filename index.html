@@ -86,14 +86,14 @@
 
         .controls-toolbar {
             position: absolute;
-            top: -50px;
+            top: -42px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
             align-items: center;
             gap: 6px;
             background: rgba(15, 23, 42, 0.9);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             z-index: 50;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -116,8 +116,7 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
-        .size-slider {
-            width: 80px;
+        .bottom-slider {
             accent-color: var(--btn-primary);
             cursor: pointer;
         }
@@ -166,7 +165,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
-                <p class="text-sm text-slate-500">Ajuste de Tamanho de Roupas, Redimensionador & Fotos</p>
+                <p class="text-sm text-slate-500">Ajuste de Tamanho via Barra Inferior & Guarda-Roupa</p>
             </div>
         </div>
         
@@ -198,7 +197,7 @@
                         <i class="fa-solid fa-door-closed"></i>
                     </div>
                     <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
-                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Ajuste perfeitamente o tamanho de cada peça sobre a sua foto utilizando a barra de tamanho.</p>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Selecione uma peça e use a barra deslizante na parte inferior para ajustá-la ao avatar.</p>
                     <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
                         <i class="fa-solid fa-door-open"></i>
                         Abrir Guarda-Roupa
@@ -231,15 +230,38 @@
                     </div>
 
                     <!-- PALCO DO PROVADOR -->
-                    <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center bg-slate-50">
-                        <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
-                            <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
-                            <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
-                            <p class="text-xs max-w-xs">Ao clicar na roupa no corpo, use a barra deslizante para aumentar ou diminuir o tamanho da peça.</p>
+                    <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex flex-col items-center justify-between p-4 bg-slate-50">
+                        
+                        <!-- ÁREA PRINCIPAL DO AVATAR -->
+                        <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
+                            <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
+                                <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
+                                <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
+                                <p class="text-xs max-w-xs">Clique em qualquer roupa para ativá-la e use o controle na barra inferior para redimensionar.</p>
+                            </div>
+
+                            <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
+                            <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
                         </div>
 
-                        <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
-                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
+                        <!-- BARRA SLIDER FICA FIXA NA PARTE INFERIOR DO PROVADOR -->
+                        <div id="size-control-panel" class="w-full bg-slate-900/90 backdrop-blur text-white px-4 py-3 rounded-xl z-30 flex items-center justify-between gap-4 shadow-lg border border-slate-700 mt-2">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-up-right-and-down-left-from-center text-purple-400 text-sm"></i>
+                                <span class="text-xs font-bold text-slate-200 whitespace-nowrap">Tamanho da Peça:</span>
+                            </div>
+
+                            <div class="flex items-center gap-3 flex-1 max-w-md">
+                                <i class="fa-solid fa-minus text-xs text-slate-400"></i>
+                                <input type="range" id="global-size-slider" min="30" max="450" value="120" disabled class="bottom-slider w-full h-2 bg-slate-700 rounded-lg appearance-none disabled:opacity-30">
+                                <i class="fa-solid fa-plus text-xs text-slate-400"></i>
+                            </div>
+
+                            <span id="slider-status-text" class="text-[11px] font-semibold text-amber-400 min-w-[110px] text-right">
+                                Selecione uma peça
+                            </span>
+                        </div>
+
                     </div>
 
                     <!-- SALVAR PERFIL DO LOOK -->
@@ -287,7 +309,7 @@
                                 <label class="text-[11px] font-semibold text-slate-500">Estação:</label>
                                 <select id="new-season" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
                                     <option value="todas">Todas</option>
-                                    <option value="Verão ☀️">Verão ☀️</option>
+                                    <option value="Verão ☀️">Verão ☀️️</option>
                                     <option value="Outono 🍂">Outono 🍂</option>
                                     <option value="Inverno ❄">Inverno ❄</option>
                                     <option value="Primavera 🌸">Primavera 🌸</option>
@@ -346,11 +368,14 @@
     </main>
 
     <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v5.0 | Redimensionador Dinâmico e Controle de Escala
+        Provador Virtual v6.0 | Controle de Escala Inferior Fixo
     </footer>
 
     <!-- JAVASCRIPT -->
     <script>
+        // Peça selecionada no momento
+        let selectedClothingElement = null;
+
         // --- 1. PEÇAS DEMO ---
         const demoClothes = [
             {
@@ -487,6 +512,7 @@
 
         btnClearCanvas.addEventListener('click', () => {
             overlayContainer.innerHTML = '';
+            deselectAll();
         });
 
         clothingUpload.addEventListener('change', (e) => {
@@ -557,8 +583,20 @@
         filterEvent.addEventListener('change', renderClothesList);
         renderClothesList();
 
-        // --- 7. ADICIONAR E REDIMENSIONAR PEÇA NO AVATAR ---
-        function addClothingToStage(src, top = '150px', left = '150px', width = 100, rotation = 0) {
+        // --- 7. SLIDER GLOBAL DA PARTE INFERIOR DO PROVADOR ---
+        const globalSizeSlider = document.getElementById('global-size-slider');
+        const sliderStatusText = document.getElementById('slider-status-text');
+
+        globalSizeSlider.addEventListener('input', (e) => {
+            if (selectedClothingElement) {
+                const newWidth = e.target.value;
+                selectedClothingElement.style.width = newWidth + 'px';
+                sliderStatusText.textContent = `${newWidth}px`;
+            }
+        });
+
+        // --- 8. ADICIONAR E SELECIONAR ROUPA ---
+        function addClothingToStage(src, top = '100px', left = '100px', width = 110, rotation = 0) {
             const wrapper = document.createElement('div');
             wrapper.className = 'clothing-wrapper';
             wrapper.style.top = top;
@@ -570,52 +608,10 @@
             img.src = src;
             img.style.transform = `rotate(${rotation}deg)`;
 
-            // Barra de Ferramentas / Redimensionador
+            // Barra de Controles rápidos (Girar / Deletar)
             const toolbar = document.createElement('div');
             toolbar.className = 'controls-toolbar hidden';
 
-            // Slider para Ajuste de Tamanho Preciso
-            const slider = document.createElement('input');
-            slider.type = 'range';
-            slider.min = '20';
-            slider.max = '400';
-            slider.value = width;
-            slider.className = 'size-slider';
-            slider.title = 'Ajuste Fino do Tamanho';
-
-            slider.addEventListener('input', (e) => {
-                e.stopPropagation();
-                const newWidth = e.target.value;
-                wrapper.style.width = newWidth + 'px';
-            });
-
-            // Botão Zoom Out (-)
-            const btnZoomOut = document.createElement('button');
-            btnZoomOut.innerHTML = '<i class="fa-solid fa-minus"></i>';
-            btnZoomOut.title = 'Diminuir Pequeno';
-            btnZoomOut.addEventListener('click', (e) => {
-                e.stopPropagation();
-                let currentWidth = parseInt(wrapper.style.width);
-                if (currentWidth > 30) {
-                    const updated = currentWidth - 10;
-                    wrapper.style.width = updated + 'px';
-                    slider.value = updated;
-                }
-            });
-
-            // Botão Zoom In (+)
-            const btnZoomIn = document.createElement('button');
-            btnZoomIn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-            btnZoomIn.title = 'Aumentar Pequeno';
-            btnZoomIn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                let currentWidth = parseInt(wrapper.style.width);
-                const updated = currentWidth + 10;
-                wrapper.style.width = updated + 'px';
-                slider.value = updated;
-            });
-
-            // Botão Girar
             const btnRotate = document.createElement('button');
             btnRotate.innerHTML = '<i class="fa-solid fa-rotate-right"></i>';
             btnRotate.title = 'Girar Peça';
@@ -626,7 +622,6 @@
                 img.style.transform = `rotate(${r}deg)`;
             });
 
-            // Botão Remover
             const btnDelete = document.createElement('button');
             btnDelete.innerHTML = '<i class="fa-solid fa-trash"></i>';
             btnDelete.className = 'hover:bg-red-600/50';
@@ -634,41 +629,64 @@
             btnDelete.addEventListener('click', (e) => {
                 e.stopPropagation();
                 wrapper.remove();
+                deselectAll();
             });
 
-            toolbar.appendChild(btnZoomOut);
-            toolbar.appendChild(slider);
-            toolbar.appendChild(btnZoomIn);
             toolbar.appendChild(btnRotate);
             toolbar.appendChild(btnDelete);
 
             wrapper.appendChild(toolbar);
             wrapper.appendChild(img);
 
-            // Ao clicar na peça, abre a barra de controles e atualiza o slider com a largura atual
+            // Clique na peça ativa o slider global na parte inferior
             wrapper.addEventListener('click', (e) => {
                 e.stopPropagation();
-                deselectAll();
-                wrapper.classList.add('selected');
-                slider.value = parseInt(wrapper.style.width);
-                toolbar.classList.remove('hidden');
-                bringToFront(wrapper);
+                selectClothing(wrapper);
             });
 
             makeDraggable(wrapper);
             overlayContainer.appendChild(wrapper);
+
+            // Seleciona automaticamente a peça recém adicionada
+            selectClothing(wrapper);
         }
 
-        document.getElementById('stage-canvas').addEventListener('click', () => {
+        function selectClothing(wrapper) {
             deselectAll();
+            selectedClothingElement = wrapper;
+            wrapper.classList.add('selected');
+
+            const tb = wrapper.querySelector('.controls-toolbar');
+            if (tb) tb.classList.remove('hidden');
+
+            bringToFront(wrapper);
+
+            // Habilita e sincroniza a barra deslizante na parte inferior
+            const currentWidth = parseInt(wrapper.style.width);
+            globalSizeSlider.disabled = false;
+            globalSizeSlider.value = currentWidth;
+            sliderStatusText.textContent = `${currentWidth}px`;
+            sliderStatusText.className = "text-[11px] font-bold text-emerald-400 min-w-[110px] text-right";
+        }
+
+        document.getElementById('stage-canvas').addEventListener('click', (e) => {
+            if (!e.target.closest('.clothing-wrapper') && !e.target.closest('#size-control-panel')) {
+                deselectAll();
+            }
         });
 
         function deselectAll() {
+            selectedClothingElement = null;
             document.querySelectorAll('.clothing-wrapper').forEach(w => {
                 w.classList.remove('selected');
                 const tb = w.querySelector('.controls-toolbar');
                 if (tb) tb.classList.add('hidden');
             });
+
+            // Reseta estado do slider da parte inferior
+            globalSizeSlider.disabled = true;
+            sliderStatusText.textContent = "Selecione uma peça";
+            sliderStatusText.className = "text-[11px] font-semibold text-amber-400 min-w-[110px] text-right";
         }
 
         function bringToFront(el) {
@@ -710,7 +728,7 @@
 
                 if (e.target.closest('.clothing-wrapper') === element) {
                     isDragging = true;
-                    bringToFront(element);
+                    selectClothing(element);
                 }
             }
 
@@ -738,11 +756,15 @@
             }
         }
 
-        // --- 8. BAIXAR LOOK ---
+        // --- 9. BAIXAR LOOK ---
         const btnDownloadImage = document.getElementById('btn-download-image');
 
         btnDownloadImage.addEventListener('click', () => {
             deselectAll();
+
+            // Oculta temporariamente o painel do slider antes da captura
+            const sizePanel = document.getElementById('size-control-panel');
+            sizePanel.style.display = 'none';
 
             const stage = document.getElementById('stage-canvas');
 
@@ -751,16 +773,18 @@
                 allowTaint: true,
                 backgroundColor: '#ffffff'
             }).then(canvas => {
+                sizePanel.style.display = 'flex'; // Restaura painel
                 const link = document.createElement('a');
                 link.download = `meu-look-${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             }).catch(err => {
+                sizePanel.style.display = 'flex';
                 alert('Erro ao gerar imagem.');
             });
         });
 
-        // --- 9. PERFIS DE LOOKS ---
+        // --- 10. PERFIS DE LOOKS ---
         let savedProfiles = [];
         const profileNameInput = document.getElementById('profile-name-input');
         const btnSaveProfile = document.getElementById('btn-save-profile');
