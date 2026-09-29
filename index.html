@@ -62,6 +62,7 @@
             border: 2px dashed #cbd5e1;
             background-color: #ffffff;
             touch-action: none; 
+            position: relative;
         }
 
         .clothing-wrapper {
@@ -252,14 +253,17 @@
                     <!-- PALCO DO PROVADOR -->
                     <div id="stage-canvas" class="relative w-full h-[520px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center p-4 bg-slate-50">
                         
-                        <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
+                        <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400 z-0">
                             <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
                             <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
                             <p class="text-xs max-w-xs">Arraste as alças nas laterais e cantos da peça para redimensioná-la no seu avatar.</p>
                         </div>
 
-                        <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
-                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
+                        <!-- Foto do Avatar no fundo -->
+                        <img id="person-img" class="hidden absolute inset-0 w-full h-full object-contain pointer-events-none z-1" alt="Avatar">
+                        
+                        <!-- Container para sobreposição das peças -->
+                        <div id="overlay-container" class="absolute inset-0 z-10"></div>
 
                     </div>
 
@@ -280,7 +284,7 @@
                 <!-- CLOSET E FERRAMENTAS (Direita) -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col gap-5">
                     
-                    <!-- CRIAR E GERENCIAR CATEGORIAS CUSTOMIZADAS -->
+                    <!-- CRIAR CATEGORIA CUSTOMIZADA -->
                     <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col gap-3 shadow-sm">
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-folder-plus text-purple-600"></i> Criar Categoria
@@ -308,7 +312,7 @@
                                 <label class="text-[11px] font-semibold text-slate-500">Estação:</label>
                                 <select id="new-season" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
                                     <option value="todas">Todas</option>
-                                    <option value="Verão ☀️">Verão ☀️️</option>
+                                    <option value="Verão ☀️">Verão ☀</option>
                                     <option value="Outono 🍂">Outono 🍂</option>
                                     <option value="Inverno ❄">Inverno ❄</option>
                                     <option value="Primavera 🌸">Primavera 🌸</option>
@@ -332,13 +336,12 @@
                         </button>
                     </div>
 
-                    <!-- FILTROS E AÇÕES DE EXCLUSÃO DE CATEGORIAS -->
+                    <!-- FILTROS E EXCLUSÃO DE CATEGORIAS -->
                     <div class="flex flex-col gap-2">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Filtrar Closet</span>
                         </div>
 
-                        <!-- Filtro de Estação com botão de excluir categoria -->
                         <div class="flex gap-1">
                             <select id="filter-season" class="flex-1 text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
                                 <option value="todas">☀️ Todas Estações</option>
@@ -348,7 +351,6 @@
                             </button>
                         </div>
 
-                        <!-- Filtro de Evento com botão de excluir categoria -->
                         <div class="flex gap-1">
                             <select id="filter-event" class="flex-1 text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
                                 <option value="todos">🎉 Todos Eventos</option>
@@ -359,7 +361,7 @@
                         </div>
                     </div>
 
-                    <!-- CABEÇALHO DA LISTA DE ROUPAS & BOTÃO ZERAR TUDO -->
+                    <!-- LISTA DE ROUPAS -->
                     <div class="flex items-center justify-between pt-2 border-t border-slate-200">
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Peças no Closet</span>
                         <button id="btn-clear-all-clothes" class="text-xs bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 transition shadow-sm">
@@ -367,12 +369,11 @@
                         </button>
                     </div>
 
-                    <!-- LISTA DE ROUPAS -->
                     <div id="clothing-list" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 max-h-[200px]">
-                        <!-- Peças renderizadas via JS -->
+                        <!-- Renderizado dinamicamente -->
                     </div>
 
-                    <!-- PERFIS DE LOOKS SALVOS -->
+                    <!-- PERFIS SAVED -->
                     <div class="pt-3 border-t border-slate-200 flex flex-col gap-2">
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                             <i class="fa-solid fa-layer-group text-purple-600"></i> Perfis Salvos
@@ -390,24 +391,21 @@
     </main>
 
     <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v8.0 | Gerenciamento de Exclusão de Categorias e Peças
+        Provador Virtual v8.2 | Ação de Limpeza Completa do Provador
     </footer>
 
     <!-- JAVASCRIPT -->
     <script>
-        // Peça selecionada
         let selectedClothingElement = null;
 
-        // Categorias padrão que não podem ser excluídas
         const defaultSeasons = ["todas", "Verão ☀️", "Outono 🍂", "Inverno ❄", "Primavera 🌸"];
         const defaultEvents = ["todos", "Casual", "Trabalho", "Festa", "Esporte", "Encontro"];
 
-        // --- 1. PEÇAS DEMO ---
         const demoClothes = [
             {
                 id: 1,
                 src: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Blue_T-shirt.png',
-                season: 'Verão ☀️️',
+                season: 'Verão ☀',
                 event: 'Casual'
             },
             {
@@ -426,7 +424,7 @@
 
         let clothesDatabase = [...demoClothes];
 
-        // --- 2. CORES ---
+        // CORES
         const bgColorInput = document.getElementById('bg-color');
         const btnColorInput = document.getElementById('btn-color');
 
@@ -440,7 +438,7 @@
             document.documentElement.style.setProperty('--btn-primary-hover', newColor + 'dd'); 
         });
 
-        // --- 3. GUARDA-ROUPA ---
+        // GUARDA-ROUPA
         const openBtn = document.getElementById('open-btn');
         const doorsLayer = document.getElementById('doors-layer');
         const wardrobeContent = document.getElementById('wardrobe-content');
@@ -453,7 +451,7 @@
             }, 500);
         });
 
-        // --- 4. AVATAR ---
+        // AVATAR
         const personUpload = document.getElementById('person-upload');
         const personImg = document.getElementById('person-img');
         const placeholderText = document.getElementById('placeholder-text');
@@ -471,7 +469,7 @@
             }
         });
 
-        // --- 5. CATEGORIAS (CRIAR E DELETAR INDIVIDUALMENTE) ---
+        // CATEGORIAS
         const newCategoryName = document.getElementById('new-category-name');
         const newCategoryType = document.getElementById('new-category-type');
         const btnAddCategory = document.getElementById('btn-add-category');
@@ -530,7 +528,6 @@
             newCategoryName.value = '';
         });
 
-        // Deletar categoria de Estação customizada
         btnDeleteSeasonCat.addEventListener('click', () => {
             const selectedVal = filterSeason.value;
             if (defaultSeasons.includes(selectedVal)) {
@@ -539,7 +536,6 @@
             }
 
             if (confirm(`Deseja excluir a categoria "${selectedVal}"?`)) {
-                // Remove opção dos selects
                 Array.from(newSeasonSelect.options).forEach(opt => {
                     if (opt.value === selectedVal) opt.remove();
                 });
@@ -548,7 +544,6 @@
             }
         });
 
-        // Deletar categoria de Evento customizada
         btnDeleteEventCat.addEventListener('click', () => {
             const selectedVal = filterEvent.value;
             if (defaultEvents.includes(selectedVal)) {
@@ -567,23 +562,31 @@
 
         updateFilterSelects();
 
-        // --- 6. RENDERIZAÇÃO E REMOÇÃO DE ROUPAS (INDIVIDUAL & TUDO) ---
+        // RENDERIZAÇÃO E PEÇAS
         const clothingUpload = document.getElementById('clothing-upload');
         const clothingList = document.getElementById('clothing-list');
         const overlayContainer = document.getElementById('overlay-container');
         const btnClearCanvas = document.getElementById('btn-clear-canvas');
         const btnClearAllClothes = document.getElementById('btn-clear-all-clothes');
 
+        // BOTÃO LIMPAR PROVADOR (RESTAURAÇÃO COMPLETA)
         btnClearCanvas.addEventListener('click', () => {
             overlayContainer.innerHTML = '';
+            personImg.src = '';
+            personImg.classList.add('hidden');
+            personUpload.value = '';
+            placeholderText.classList.remove('hidden');
             deselectAll();
         });
 
-        // Botão para Zerar Todo o Guarda-Roupa
         btnClearAllClothes.addEventListener('click', () => {
-            if (confirm('Tem certeza que deseja apagar TODAS as roupas do guarda-roupa? Esta ação não pode ser desfeita.')) {
+            if (confirm('Tem certeza que deseja apagar TODAS as roupas do guarda-roupa?')) {
                 clothesDatabase = [];
                 overlayContainer.innerHTML = '';
+                personImg.src = '';
+                personImg.classList.add('hidden');
+                personUpload.value = '';
+                placeholderText.classList.remove('hidden');
                 deselectAll();
                 renderClothesList();
             }
@@ -639,7 +642,6 @@
                 const card = document.createElement('div');
                 card.className = 'clothing-card flex flex-col gap-1.5';
 
-                // Botão individual para deletar a peça do closet
                 const btnDeletePiece = document.createElement('button');
                 btnDeletePiece.className = 'absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-[10px] z-10 shadow transition';
                 btnDeletePiece.title = 'Excluir esta roupa do closet';
@@ -673,7 +675,7 @@
         filterEvent.addEventListener('change', renderClothesList);
         renderClothesList();
 
-        // --- 7. PALCO E ALÇAS DE REDIMENSIONAMENTO ---
+        // PALCO E MOVIMENTAÇÃO
         function addClothingToStage(src, top = '120px', left = '120px', width = 130, height = 150, rotation = 0) {
             const wrapper = document.createElement('div');
             wrapper.className = 'clothing-wrapper';
@@ -766,7 +768,6 @@
             el.style.zIndex = '20';
         }
 
-        // --- 8. MOVER (DRAG) ---
         function makeDraggable(element) {
             let isDragging = false;
             let startX, startY, startLeft, startTop;
@@ -819,7 +820,6 @@
             }
         }
 
-        // --- 9. REDIMENSIONAR (RESIZE) ---
         function makeResizable(element, handle) {
             handle.addEventListener('mousedown', initResize);
             handle.addEventListener('touchstart', initResize, { passive: false });
@@ -884,7 +884,7 @@
             }
         }
 
-        // --- 10. BAIXAR LOOK ---
+        // BAIXAR LOOK
         const btnDownloadImage = document.getElementById('btn-download-image');
 
         btnDownloadImage.addEventListener('click', () => {
@@ -906,7 +906,7 @@
             });
         });
 
-        // --- 11. PERFIS DE LOOKS ---
+        // PERFIS DE LOOKS
         let savedProfiles = [];
         const profileNameInput = document.getElementById('profile-name-input');
         const btnSaveProfile = document.getElementById('btn-save-profile');
