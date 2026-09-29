@@ -52,9 +52,7 @@
             border-radius: 50%;
             cursor: pointer;
         }
-        input[type="color"]::-webkit-color-swatch-wrapper {
-            padding: 0;
-        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch {
             border: 2px solid #e2e8f0;
             border-radius: 50%;
@@ -66,24 +64,56 @@
             touch-action: none; 
         }
 
+        /* CONTAINER DA ROUPA COM ALÇAS DE REDIMENSIONAMENTO */
         .clothing-wrapper {
             position: absolute;
             cursor: move;
             user-select: none;
+            box-sizing: border-box;
         }
 
         .clothing-wrapper.selected {
             outline: 2px dashed var(--btn-primary);
-            outline-offset: 4px;
+            outline-offset: 2px;
         }
 
         .clothing-wrapper img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: fill;
             pointer-events: none;
+            display: block;
         }
 
+        /* PONTOS DE AJUSTE NAS LATERAIS E DIAGONAIS */
+        .resize-handle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #ffffff;
+            border: 2px solid var(--btn-primary);
+            border-radius: 50%;
+            z-index: 60;
+            display: none;
+            box-shadow: 0 0 4px rgba(0,0,0,0.3);
+        }
+
+        .clothing-wrapper.selected .resize-handle {
+            display: block;
+        }
+
+        /* POSICIONAMENTO E CURSORES DAS ALÇAS */
+        .resize-handle.nw { top: -6px; left: -6px; cursor: nwse-resize; }
+        .resize-handle.ne { top: -6px; right: -6px; cursor: nesw-resize; }
+        .resize-handle.sw { bottom: -6px; left: -6px; cursor: nesw-resize; }
+        .resize-handle.se { bottom: -6px; right: -6px; cursor: nwse-resize; }
+
+        .resize-handle.n  { top: -6px; left: calc(50% - 6px); cursor: ns-resize; }
+        .resize-handle.s  { bottom: -6px; left: calc(50% - 6px); cursor: ns-resize; }
+        .resize-handle.w  { top: calc(50% - 6px); left: -6px; cursor: ew-resize; }
+        .resize-handle.e  { top: calc(50% - 6px); right: -6px; cursor: ew-resize; }
+
+        /* BARRA SUPERIOR DE FERRAMENTAS DA PEÇA SELECIONADA */
         .controls-toolbar {
             position: absolute;
             top: -42px;
@@ -95,7 +125,7 @@
             background: rgba(15, 23, 42, 0.9);
             padding: 4px 10px;
             border-radius: 20px;
-            z-index: 50;
+            z-index: 70;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             white-space: nowrap;
         }
@@ -114,11 +144,6 @@
 
         .controls-toolbar button:hover {
             background: rgba(255, 255, 255, 0.2);
-        }
-
-        .bottom-slider {
-            accent-color: var(--btn-primary);
-            cursor: pointer;
         }
 
         .clothing-card {
@@ -150,9 +175,7 @@
             font-weight: 600;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6">
@@ -165,7 +188,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
-                <p class="text-sm text-slate-500">Ajuste de Tamanho via Barra Inferior & Guarda-Roupa</p>
+                <p class="text-sm text-slate-500">Ajuste de Peça por Alças Laterais & Diagonais</p>
             </div>
         </div>
         
@@ -197,7 +220,7 @@
                         <i class="fa-solid fa-door-closed"></i>
                     </div>
                     <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
-                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Selecione uma peça e use a barra deslizante na parte inferior para ajustá-la ao avatar.</p>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Clique na peça de roupa para ativá-la e use os pontos nas pontas e laterais para redimensionar livremente.</p>
                     <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
                         <i class="fa-solid fa-door-open"></i>
                         Abrir Guarda-Roupa
@@ -230,37 +253,16 @@
                     </div>
 
                     <!-- PALCO DO PROVADOR -->
-                    <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex flex-col items-center justify-between p-4 bg-slate-50">
+                    <div id="stage-canvas" class="relative w-full h-[520px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center p-4 bg-slate-50">
                         
-                        <!-- ÁREA PRINCIPAL DO AVATAR -->
-                        <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
-                            <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
-                                <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
-                                <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
-                                <p class="text-xs max-w-xs">Clique em qualquer roupa para ativá-la e use o controle na barra inferior para redimensionar.</p>
-                            </div>
-
-                            <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
-                            <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
+                        <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
+                            <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
+                            <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
+                            <p class="text-xs max-w-xs">Ao selecionar uma peça, arraste as pontas ou bordas para ajustar a altura e largura.</p>
                         </div>
 
-                        <!-- BARRA SLIDER FICA FIXA NA PARTE INFERIOR DO PROVADOR -->
-                        <div id="size-control-panel" class="w-full bg-slate-900/90 backdrop-blur text-white px-4 py-3 rounded-xl z-30 flex items-center justify-between gap-4 shadow-lg border border-slate-700 mt-2">
-                            <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-up-right-and-down-left-from-center text-purple-400 text-sm"></i>
-                                <span class="text-xs font-bold text-slate-200 whitespace-nowrap">Tamanho da Peça:</span>
-                            </div>
-
-                            <div class="flex items-center gap-3 flex-1 max-w-md">
-                                <i class="fa-solid fa-minus text-xs text-slate-400"></i>
-                                <input type="range" id="global-size-slider" min="30" max="450" value="120" disabled class="bottom-slider w-full h-2 bg-slate-700 rounded-lg appearance-none disabled:opacity-30">
-                                <i class="fa-solid fa-plus text-xs text-slate-400"></i>
-                            </div>
-
-                            <span id="slider-status-text" class="text-[11px] font-semibold text-amber-400 min-w-[110px] text-right">
-                                Selecione uma peça
-                            </span>
-                        </div>
+                        <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
+                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
 
                     </div>
 
@@ -309,7 +311,7 @@
                                 <label class="text-[11px] font-semibold text-slate-500">Estação:</label>
                                 <select id="new-season" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
                                     <option value="todas">Todas</option>
-                                    <option value="Verão ☀️">Verão ☀️️</option>
+                                    <option value="Verão ☀️">Verão ☀️</option>
                                     <option value="Outono 🍂">Outono 🍂</option>
                                     <option value="Inverno ❄">Inverno ❄</option>
                                     <option value="Primavera 🌸">Primavera 🌸</option>
@@ -338,7 +340,7 @@
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Filtrar Closet</span>
                         <div class="grid grid-cols-2 gap-2">
                             <select id="filter-season" class="text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
-                                <option value="todas">☀️ Todas Estações</option>
+                                <option value="todas">☀️️ Todas Estações</option>
                             </select>
                             <select id="filter-event" class="text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
                                 <option value="todos">🎉 Todos Eventos</option>
@@ -368,12 +370,12 @@
     </main>
 
     <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v6.0 | Controle de Escala Inferior Fixo
+        Provador Virtual v7.0 | Transformação por Alças Diagonais e Laterais
     </footer>
 
     <!-- JAVASCRIPT -->
     <script>
-        // Peça selecionada no momento
+        // Peça selecionada
         let selectedClothingElement = null;
 
         // --- 1. PEÇAS DEMO ---
@@ -400,7 +402,7 @@
 
         let clothesDatabase = [...demoClothes];
 
-        // --- 2. CONFIGURAÇÃO DE CORES ---
+        // --- 2. CORES ---
         const bgColorInput = document.getElementById('bg-color');
         const btnColorInput = document.getElementById('btn-color');
 
@@ -583,32 +585,20 @@
         filterEvent.addEventListener('change', renderClothesList);
         renderClothesList();
 
-        // --- 7. SLIDER GLOBAL DA PARTE INFERIOR DO PROVADOR ---
-        const globalSizeSlider = document.getElementById('global-size-slider');
-        const sliderStatusText = document.getElementById('slider-status-text');
-
-        globalSizeSlider.addEventListener('input', (e) => {
-            if (selectedClothingElement) {
-                const newWidth = e.target.value;
-                selectedClothingElement.style.width = newWidth + 'px';
-                sliderStatusText.textContent = `${newWidth}px`;
-            }
-        });
-
-        // --- 8. ADICIONAR E SELECIONAR ROUPA ---
-        function addClothingToStage(src, top = '100px', left = '100px', width = 110, rotation = 0) {
+        // --- 7. CRIAR ROUPA E ADICIONAR ALÇAS DE REDIMENSIONAMENTO ---
+        function addClothingToStage(src, top = '120px', left = '120px', width = 130, height = 150, rotation = 0) {
             const wrapper = document.createElement('div');
             wrapper.className = 'clothing-wrapper';
             wrapper.style.top = top;
             wrapper.style.left = left;
             wrapper.style.width = width + 'px';
+            wrapper.style.height = height + 'px';
             wrapper.dataset.rotation = rotation;
 
             const img = document.createElement('img');
             img.src = src;
-            img.style.transform = `rotate(${rotation}deg)`;
 
-            // Barra de Controles rápidos (Girar / Deletar)
+            // Barra de Ações Rápidas (Girar / Deletar)
             const toolbar = document.createElement('div');
             toolbar.className = 'controls-toolbar hidden';
 
@@ -619,7 +609,7 @@
                 e.stopPropagation();
                 let r = (parseInt(wrapper.dataset.rotation) + 15) % 360;
                 wrapper.dataset.rotation = r;
-                img.style.transform = `rotate(${r}deg)`;
+                wrapper.style.transform = `rotate(${r}deg)`;
             });
 
             const btnDelete = document.createElement('button');
@@ -634,11 +624,19 @@
 
             toolbar.appendChild(btnRotate);
             toolbar.appendChild(btnDelete);
-
             wrapper.appendChild(toolbar);
             wrapper.appendChild(img);
 
-            // Clique na peça ativa o slider global na parte inferior
+            // Criar as 8 alças nas pontas e laterais
+            const handlePositions = ['nw', 'ne', 'sw', 'se', 'n', 's', 'w', 'e'];
+            handlePositions.forEach(pos => {
+                const handle = document.createElement('div');
+                handle.className = `resize-handle ${pos}`;
+                handle.dataset.direction = pos;
+                wrapper.appendChild(handle);
+                makeResizable(wrapper, handle);
+            });
+
             wrapper.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectClothing(wrapper);
@@ -647,7 +645,6 @@
             makeDraggable(wrapper);
             overlayContainer.appendChild(wrapper);
 
-            // Seleciona automaticamente a peça recém adicionada
             selectClothing(wrapper);
         }
 
@@ -660,17 +657,10 @@
             if (tb) tb.classList.remove('hidden');
 
             bringToFront(wrapper);
-
-            // Habilita e sincroniza a barra deslizante na parte inferior
-            const currentWidth = parseInt(wrapper.style.width);
-            globalSizeSlider.disabled = false;
-            globalSizeSlider.value = currentWidth;
-            sliderStatusText.textContent = `${currentWidth}px`;
-            sliderStatusText.className = "text-[11px] font-bold text-emerald-400 min-w-[110px] text-right";
         }
 
         document.getElementById('stage-canvas').addEventListener('click', (e) => {
-            if (!e.target.closest('.clothing-wrapper') && !e.target.closest('#size-control-panel')) {
+            if (!e.target.closest('.clothing-wrapper')) {
                 deselectAll();
             }
         });
@@ -682,11 +672,6 @@
                 const tb = w.querySelector('.controls-toolbar');
                 if (tb) tb.classList.add('hidden');
             });
-
-            // Reseta estado do slider da parte inferior
-            globalSizeSlider.disabled = true;
-            sliderStatusText.textContent = "Selecione uma peça";
-            sliderStatusText.className = "text-[11px] font-semibold text-amber-400 min-w-[110px] text-right";
         }
 
         function bringToFront(el) {
@@ -695,76 +680,132 @@
             el.style.zIndex = '20';
         }
 
+        // --- 8. SISTEMA DE MOVER (DRAG) ---
         function makeDraggable(element) {
             let isDragging = false;
-            let currentX, currentY, initialX, initialY;
-            let xOffset = 0, yOffset = 0;
-
+            let startX, startY, startLeft, startTop;
             const stage = document.getElementById('stage-canvas');
 
             element.addEventListener('mousedown', dragStart);
-            stage.addEventListener('mousemove', drag);
-            stage.addEventListener('mouseup', dragEnd);
-
             element.addEventListener('touchstart', dragStart, { passive: false });
-            stage.addEventListener('touchmove', drag, { passive: false });
-            stage.addEventListener('touchend', dragEnd);
-
-            if (element.style.left && element.style.top) {
-                xOffset = parseInt(element.style.left);
-                yOffset = parseInt(element.style.top);
-            }
 
             function dragStart(e) {
-                if (e.target.closest('.controls-toolbar')) return;
-
-                if (e.type === 'touchstart') {
-                    initialX = e.touches[0].clientX - xOffset;
-                    initialY = e.touches[0].clientY - yOffset;
-                } else {
-                    initialX = e.clientX - xOffset;
-                    initialY = e.clientY - yOffset;
+                if (e.target.classList.contains('resize-handle') || e.target.closest('.controls-toolbar')) {
+                    return;
                 }
 
-                if (e.target.closest('.clothing-wrapper') === element) {
-                    isDragging = true;
-                    selectClothing(element);
-                }
+                isDragging = true;
+                selectClothing(element);
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                startX = clientX;
+                startY = clientY;
+                startLeft = parseInt(element.style.left) || 0;
+                startTop = parseInt(element.style.top) || 0;
+
+                window.addEventListener('mousemove', dragging);
+                window.addEventListener('touchmove', dragging, { passive: false });
+                window.addEventListener('mouseup', dragEnd);
+                window.addEventListener('touchend', dragEnd);
             }
 
-            function drag(e) {
-                if (isDragging) {
-                    e.preventDefault();
-                    if (e.type === 'touchmove') {
-                        currentX = e.touches[0].clientX - initialX;
-                        currentY = e.touches[0].clientY - initialY;
-                    } else {
-                        currentX = e.clientX - initialX;
-                        currentY = e.clientY - initialY;
-                    }
-                    xOffset = currentX;
-                    yOffset = currentY;
-                    element.style.left = currentX + 'px';
-                    element.style.top = currentY + 'px';
-                }
+            function dragging(e) {
+                if (!isDragging) return;
+                if (e.cancelable) e.preventDefault();
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
+
+                element.style.left = (startLeft + deltaX) + 'px';
+                element.style.top = (startTop + deltaY) + 'px';
             }
 
             function dragEnd() {
-                initialX = currentX;
-                initialY = currentY;
                 isDragging = false;
+                window.removeEventListener('mousemove', dragging);
+                window.removeEventListener('touchmove', dragging);
+                window.removeEventListener('mouseup', dragEnd);
+                window.removeEventListener('touchend', dragEnd);
             }
         }
 
-        // --- 9. BAIXAR LOOK ---
+        // --- 9. SISTEMA DE REDIMENSIONAMENTO NAS 8 ALÇAS ---
+        function makeResizable(element, handle) {
+            handle.addEventListener('mousedown', initResize);
+            handle.addEventListener('touchstart', initResize, { passive: false });
+
+            function initResize(e) {
+                e.stopPropagation();
+                if (e.cancelable) e.preventDefault();
+
+                const dir = handle.dataset.direction;
+                const startX = e.touches ? e.touches[0].clientX : e.clientX;
+                const startY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                const startWidth = parseInt(document.defaultView.getComputedStyle(element).width, 10);
+                const startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10);
+                const startLeft = parseInt(element.style.left) || 0;
+                const startTop = parseInt(element.style.top) || 0;
+
+                function doResize(e) {
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                    const deltaX = clientX - startX;
+                    const deltaY = clientY - startY;
+
+                    let newW = startWidth;
+                    let newH = startHeight;
+                    let newL = startLeft;
+                    let newT = startTop;
+
+                    // Ajuste diagonal mantendo proporção ou livre por borda
+                    if (dir.includes('e')) newW = startWidth + deltaX;
+                    if (dir.includes('s')) newH = startHeight + deltaY;
+                    if (dir.includes('w')) {
+                        newW = startWidth - deltaX;
+                        newL = startLeft + deltaX;
+                    }
+                    if (dir.includes('n')) {
+                        newH = startHeight - deltaY;
+                        newT = startTop + deltaY;
+                    }
+
+                    // Limite mínimo de tamanho
+                    if (newW > 30) {
+                        element.style.width = newW + 'px';
+                        element.style.left = newL + 'px';
+                    }
+                    if (newH > 30) {
+                        element.style.height = newH + 'px';
+                        element.style.top = newT + 'px';
+                    }
+                }
+
+                function stopResize() {
+                    window.removeEventListener('mousemove', doResize);
+                    window.removeEventListener('touchmove', doResize);
+                    window.removeEventListener('mouseup', stopResize);
+                    window.removeEventListener('touchend', stopResize);
+                }
+
+                window.addEventListener('mousemove', doResize);
+                window.addEventListener('touchmove', doResize, { passive: false });
+                window.addEventListener('mouseup', stopResize);
+                window.addEventListener('touchend', stopResize);
+            }
+        }
+
+        // --- 10. BAIXAR LOOK ---
         const btnDownloadImage = document.getElementById('btn-download-image');
 
         btnDownloadImage.addEventListener('click', () => {
             deselectAll();
-
-            // Oculta temporariamente o painel do slider antes da captura
-            const sizePanel = document.getElementById('size-control-panel');
-            sizePanel.style.display = 'none';
 
             const stage = document.getElementById('stage-canvas');
 
@@ -773,18 +814,16 @@
                 allowTaint: true,
                 backgroundColor: '#ffffff'
             }).then(canvas => {
-                sizePanel.style.display = 'flex'; // Restaura painel
                 const link = document.createElement('a');
                 link.download = `meu-look-${Date.now()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             }).catch(err => {
-                sizePanel.style.display = 'flex';
                 alert('Erro ao gerar imagem.');
             });
         });
 
-        // --- 10. PERFIS DE LOOKS ---
+        // --- 11. PERFIS DE LOOKS ---
         let savedProfiles = [];
         const profileNameInput = document.getElementById('profile-name-input');
         const btnSaveProfile = document.getElementById('btn-save-profile');
@@ -809,6 +848,7 @@
                 top: item.style.top,
                 left: item.style.left,
                 width: parseInt(item.style.width),
+                height: parseInt(item.style.height),
                 rotation: item.dataset.rotation || 0
             }));
 
@@ -865,7 +905,7 @@
         function loadProfile(profile) {
             overlayContainer.innerHTML = '';
             profile.items.forEach(item => {
-                addClothingToStage(item.src, item.top, item.left, item.width, item.rotation);
+                addClothingToStage(item.src, item.top, item.left, item.width, item.height, item.rotation);
             });
         }
 
