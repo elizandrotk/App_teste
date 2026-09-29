@@ -6,12 +6,12 @@
     <title>Provador Virtual & Guarda-Roupa Digital</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome for Icons -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -96,26 +96,33 @@
         .clothing-overlay {
             touch-action: none;
             user-select: none;
+            position: absolute;
+            cursor: grab;
+        }
+
+        .clothing-overlay:active {
+            cursor: grabbing;
         }
 
         .clothing-overlay.active {
             outline: 2px dashed var(--color-primary);
             outline-offset: 4px;
+            border-radius: 8px;
         }
 
         .wood-texture {
-            background-color: #5c3a21;
+            background-color: #3e2415;
             background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0),
-                              linear-gradient(90deg, rgba(0, 0, 0, 0.15) 0%, transparent 50%, rgba(0, 0, 0, 0.15) 100%);
+                              linear-gradient(90deg, rgba(0, 0, 0, 0.2) 0%, transparent 50%, rgba(0, 0, 0, 0.2) 100%);
             background-size: 20px 20px, 100% 100%;
         }
 
         .wood-panel {
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="min-h-screen flex flex-col antialiased selection:bg-purple-500 selection:text-white">
 
     <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -130,12 +137,12 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <!-- Theme/Color Config Modal Button -->
+                <!-- Theme/Color Config Button -->
                 <button id="btn-open-theme" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-2 text-xs sm:text-sm font-medium">
                     <i class="fa-solid fa-palette text-purple-600 dark:text-purple-400"></i>
                     <span class="hidden sm:inline">Cores & Temas</span>
                 </button>
-                <!-- Close Wardrobe Button (Visible when open) -->
+                <!-- Toggle Wardrobe Doors Button -->
                 <button id="btn-toggle-wardrobe" class="hidden p-2.5 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-900/30 dark:text-purple-300 transition flex items-center gap-2 text-xs sm:text-sm font-medium border border-purple-200 dark:border-purple-800">
                     <i class="fa-solid fa-door-closed"></i>
                     <span id="toggle-wardrobe-text">Fechar Roupeiro</span>
@@ -144,31 +151,29 @@
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 flex flex-col gap-6">
 
         <!-- WARDROBE CONTAINER WITH 3D DOORS -->
-        <div id="wardrobe-container" class="wardrobe-perspective relative w-full rounded-3xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-800 min-h-[600px] flex flex-col justify-center">
+        <div id="wardrobe-container" class="wardrobe-perspective relative w-full rounded-3xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-800 min-h-[640px] flex flex-col justify-center">
             
             <!-- WARDROBE DOORS LAYER -->
             <div id="doors-layer" class="absolute inset-0 z-20 flex w-full h-full pointer-events-auto">
                 <!-- Left Door -->
                 <div id="door-left" class="door-left w-1/2 h-full wood-texture wood-panel border-r-2 border-amber-950 flex flex-col justify-center items-end pr-4 sm:pr-8 relative">
-                    <!-- Handle Left -->
-                    <div class="w-4 sm:w-5 h-24 sm:h-32 bg-amber-200/80 rounded-full border border-amber-400/50 shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
-                        <div class="w-1.5 h-12 bg-amber-600/50 rounded-full"></div>
+                    <div class="w-4 sm:w-5 h-28 sm:h-36 bg-amber-200/90 rounded-full border border-amber-400/50 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
+                        <div class="w-1.5 h-16 bg-amber-700/60 rounded-full"></div>
                     </div>
                 </div>
 
                 <!-- Right Door -->
                 <div id="door-right" class="door-right w-1/2 h-full wood-texture wood-panel border-l-2 border-amber-950 flex flex-col justify-center items-start pl-4 sm:pl-8 relative">
-                    <!-- Handle Right -->
-                    <div class="w-4 sm:w-5 h-24 sm:h-32 bg-amber-200/80 rounded-full border border-amber-400/50 shadow-lg flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
-                        <div class="w-1.5 h-12 bg-amber-600/50 rounded-full"></div>
+                    <div class="w-4 sm:w-5 h-28 sm:h-36 bg-amber-200/90 rounded-full border border-amber-400/50 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
+                        <div class="w-1.5 h-16 bg-amber-700/60 rounded-full"></div>
                     </div>
                 </div>
 
                 <!-- Open Button Center Overlay -->
-                <div id="doors-center-btn" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-xs z-30 transition-opacity duration-300">
+                <div id="doors-center-btn" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-xs z-30 transition-opacity duration-300">
                     <div class="text-center p-6 max-w-sm">
                         <div class="w-16 h-16 rounded-2xl bg-amber-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-900/50 text-2xl">
                             <i class="fa-solid fa-door-open"></i>
@@ -182,8 +187,8 @@
                 </div>
             </div>
 
-            <!-- INTERIOR WARDROBE CONTENT (REVEALED WHEN DOORS OPEN) -->
-            <div id="wardrobe-interior" class="relative z-10 w-full h-full bg-slate-100 dark:bg-slate-900 p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 opacity-0 transition-opacity duration-500 pointer-events-none">
+            <!-- INTERIOR WARDROBE CONTENT -->
+            <div id="wardrobe-interior" class="relative z-10 w-full h-full bg-slate-100 dark:bg-slate-900 p-3 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 opacity-0 transition-opacity duration-500 pointer-events-none">
                 
                 <!-- LEFT COLUMN: PROVADOR / VIRTUAL FITTING ROOM -->
                 <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5 flex flex-col">
@@ -193,31 +198,33 @@
                             <h2 class="font-bold text-slate-800 dark:text-slate-100">Provador Virtual</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <label for="input-person-photo" class="cursor-pointer text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-semibold px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition flex items-center gap-1.5">
+                            <!-- Hidden input trigger for avatar upload -->
+                            <input type="file" id="input-person-photo" accept="image/*" class="hidden">
+                            
+                            <button id="btn-trigger-person-photo" class="text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-semibold px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition flex items-center gap-1.5">
                                 <i class="fa-solid fa-camera"></i>
                                 <span>Sua Foto</span>
-                            </label>
-                            <input type="file" id="input-person-photo" accept="image/*" capture="user" class="hidden">
+                            </button>
                             
-                            <button id="btn-clear-canvas" class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition">
-                                Limpar
+                            <button id="btn-clear-canvas" class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition" title="Remover roupas do corpo">
+                                Limpar Peças
                             </button>
                         </div>
                     </div>
 
-                    <!-- FITTING ROOM STAGE / CANVAS CONTAINER -->
-                    <div id="fitting-stage" class="relative flex-1 w-full min-h-[420px] sm:min-h-[500px] bg-slate-50 dark:bg-slate-950 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center">
+                    <!-- FITTING ROOM STAGE (CLICKABLE TO UPLOAD IF EMPTY) -->
+                    <div id="fitting-stage" class="relative flex-1 w-full min-h-[420px] sm:min-h-[500px] bg-slate-50 dark:bg-slate-950 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center cursor-pointer">
                         
                         <!-- Placeholder when no photo -->
-                        <div id="person-placeholder" class="text-center p-6 flex flex-col items-center">
-                            <div class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-3">
-                                <i class="fa-solid fa-user-large text-2xl"></i>
+                        <div id="person-placeholder" class="text-center p-6 flex flex-col items-center select-none">
+                            <div class="w-20 h-20 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3 shadow-inner">
+                                <i class="fa-solid fa-camera text-3xl"></i>
                             </div>
-                            <p class="font-medium text-slate-600 dark:text-slate-300 text-sm mb-1">Foto de Corpo Inteiro</p>
-                            <p class="text-xs text-slate-400 max-w-xs mb-4">Tire uma foto ou faça upload para começar a experimentar suas roupas.</p>
-                            <label for="input-person-photo" class="cursor-pointer py-2.5 px-4 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md shadow-purple-500/20 hover:bg-purple-700 transition">
-                                Carregar Foto
-                            </label>
+                            <p class="font-bold text-slate-700 dark:text-slate-200 text-base mb-1">Toque aqui para enviar sua foto</p>
+                            <p class="text-xs text-slate-400 max-w-xs mb-4">Escolha uma foto da galeria do seu celular ou do seu computador para experimentar os looks.</p>
+                            <span class="py-2.5 px-5 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md shadow-purple-500/20 hover:bg-purple-700 transition">
+                                <i class="fa-solid fa-upload mr-1"></i> Carregar Foto do Dispositivo
+                            </span>
                         </div>
 
                         <!-- Person Base Image -->
@@ -238,20 +245,20 @@
                             <i class="fa-solid fa-plus text-slate-400"></i>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btn-item-layer-up" class="p-1.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Avançar Camada">
+                            <button id="btn-item-layer-up" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Avançar Camada">
                                 <i class="fa-solid fa-layer-group"></i> +
                             </button>
-                            <button id="btn-item-layer-down" class="p-1.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Recuar Camada">
+                            <button id="btn-item-layer-down" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Recuar Camada">
                                 <i class="fa-solid fa-layer-group"></i> -
                             </button>
-                            <button id="btn-item-delete" class="p-1.5 rounded bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100" title="Remover Peça">
-                                <i class="fa-solid fa-trash-can"></i>
+                            <button id="btn-item-delete" class="p-2 rounded bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100 font-semibold flex items-center gap-1" title="Remover Peça">
+                                <i class="fa-solid fa-trash-can"></i> Remover Peça
                             </button>
                         </div>
                     </div>
 
                     <!-- SAVE LOOK BAR -->
-                    <div class="mt-4 flex gap-2">
+                    <div class="mt-4 flex flex-col sm:flex-row gap-2">
                         <input type="text" id="input-look-name" placeholder="Nome do Look (Ex: Look Trabalho)" class="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                         <select id="select-look-occasion" class="px-3 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option value="Casual">Casual</option>
@@ -260,9 +267,9 @@
                             <option value="Esporte">Esporte</option>
                             <option value="Elegante">Elegante</option>
                         </select>
-                        <button id="btn-save-look" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-md shadow-purple-500/20">
+                        <button id="btn-save-look" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-md shadow-purple-500/20">
                             <i class="fa-solid fa-bookmark"></i>
-                            <span class="hidden sm:inline">Salvar Look</span>
+                            <span>Salvar Look</span>
                         </button>
                     </div>
                 </div>
@@ -273,7 +280,7 @@
                     <!-- TAB NAVIGATION -->
                     <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
                         <button id="tab-btn-closet" class="flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-vector-square"></i> Guardar-Roupa
+                            <i class="fa-solid fa-shirt"></i> Guarda-Roupa
                         </button>
                         <button id="tab-btn-looks" class="flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-heart"></i> Looks Salvos (<span id="looks-count">0</span>)
@@ -283,19 +290,19 @@
                     <!-- TAB 1: CLOSET CLOTHES MANAGEMENT -->
                     <div id="tab-content-closet" class="flex-1 flex flex-col gap-4">
                         
-                        <!-- ADD CLOTHING ITEM BAR -->
+                        <!-- ADD CLOTHING ITEM BUTTON -->
                         <div class="flex gap-2">
-                            <label for="input-clothing-photo" class="flex-1 cursor-pointer py-2.5 px-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 transition flex items-center justify-center gap-2 text-xs font-semibold">
-                                <i class="fa-solid fa-plus text-sm"></i>
-                                <span>Adicionar Nova Peça</span>
-                            </label>
                             <input type="file" id="input-clothing-photo" accept="image/*" class="hidden">
+                            <button id="btn-trigger-add-clothing" class="w-full cursor-pointer py-3 px-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 transition flex items-center justify-center gap-2 text-xs font-semibold">
+                                <i class="fa-solid fa-plus text-sm"></i>
+                                <span>Adicionar Nova Peça do Celular/PC</span>
+                            </button>
                         </div>
 
                         <!-- CATEGORIES FILTERS -->
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none text-xs">
                             <button class="category-btn active px-3 py-1.5 rounded-lg bg-purple-600 text-white font-medium whitespace-nowrap" data-cat="all">Todas</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Tops">Tops/Camisas</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Tops">Tops/Blusas</button>
                             <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Bottoms">Calças/Saias</button>
                             <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Dresses">Vestidos</button>
                             <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Shoes">Sapatos</button>
@@ -303,7 +310,7 @@
                         </div>
 
                         <!-- CLOTHES GRID GALLERY -->
-                        <div id="clothes-grid" class="flex-1 min-h-[300px] max-h-[460px] overflow-y-auto grid grid-cols-3 gap-2.5 p-1">
+                        <div id="clothes-grid" class="flex-1 min-h-[300px] max-h-[460px] overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-1">
                             <!-- Dynamic Clothes Grid Content -->
                         </div>
                     </div>
@@ -336,631 +343,9 @@
 
     </main>
 
+    <!-- THEME MODAL -->
     <div id="modal-theme" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity">
         <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform">
             <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100 dark:border-slate-700">
                 <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-palette text-purple-600"></i> Personalizar Aparência
-                </h3>
-                <button id="btn-close-theme" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- PRESET THEMES -->
-            <div class="mb-5">
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Temas Prontos:</label>
-                <div class="grid grid-cols-3 gap-2">
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#f8fafc" data-primary="#8b5cf6">
-                        <span class="w-3.5 h-3.5 rounded-full bg-purple-500 inline-block"></span> Roxo Claro
-                    </button>
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#0f172a" data-primary="#a855f7">
-                        <span class="w-3.5 h-3.5 rounded-full bg-purple-400 inline-block"></span> Modo Escuro
-                    </button>
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#fdf2f8" data-primary="#ec4899">
-                        <span class="w-3.5 h-3.5 rounded-full bg-pink-500 inline-block"></span> Rosê Pastel
-                    </button>
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#f0fdf4" data-primary="#10b981">
-                        <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 inline-block"></span> Menta
-                    </button>
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#fffbeb" data-primary="#d97706">
-                        <span class="w-3.5 h-3.5 rounded-full bg-amber-600 inline-block"></span> Quente
-                    </button>
-                    <button class="preset-theme-btn p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 hover:bg-slate-50" data-bg="#f1f5f9" data-primary="#2563eb">
-                        <span class="w-3.5 h-3.5 rounded-full bg-blue-600 inline-block"></span> Azul Neutro
-                    </button>
-                </div>
-            </div>
-
-            <!-- CUSTOM COLOR PICKERS -->
-            <div class="space-y-4 mb-6">
-                <div class="flex items-center justify-between">
-                    <label for="picker-bg" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Cor de Fundo da Página:</label>
-                    <input type="color" id="picker-bg" value="#f8fafc" class="w-9 h-9 rounded-lg cursor-pointer border border-slate-200">
-                </div>
-                <div class="flex items-center justify-between">
-                    <label for="picker-primary" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Cor Primária (Botões & Destaques):</label>
-                    <input type="color" id="picker-primary" value="#8b5cf6" class="w-9 h-9 rounded-lg cursor-pointer border border-slate-200">
-                </div>
-            </div>
-
-            <button id="btn-apply-theme" class="w-full py-2.5 rounded-xl bg-purple-600 text-white font-semibold text-sm hover:bg-purple-700 transition">
-                Concluído
-            </button>
-        </div>
-    </div>
-
-    <!-- ADD CLOTHING ITEM CATEGORY SELECTION MODAL -->
-    <div id="modal-category" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
-            <h3 class="font-bold text-slate-800 dark:text-slate-100 mb-2">Categoria da Peça</h3>
-            <p class="text-xs text-slate-500 mb-4">Selecione onde salvar esta peça no seu guarda-roupa:</p>
-            
-            <div class="space-y-2 mb-6">
-                <button class="select-category-btn w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2" data-cat="Tops">
-                    <i class="fa-solid fa-shirt text-purple-600"></i> Tops / Camisas / Blusas
-                </button>
-                <button class="select-category-btn w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2" data-cat="Bottoms">
-                    <i class="fa-solid fa-person-dots-from-line text-purple-600"></i> Calças / Bermudas / Saias
-                </button>
-                <button class="select-category-btn w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2" data-cat="Dresses">
-                    <i class="fa-solid fa-person-dress text-purple-600"></i> Vestidos / Macacões
-                </button>
-                <button class="select-category-btn w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2" data-cat="Shoes">
-                    <i class="fa-solid fa-shoe-prints text-purple-600"></i> Calçados / Sapatos
-                </button>
-                <button class="select-category-btn w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-left text-xs font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-2" data-cat="Accessories">
-                    <i class="fa-solid fa-glasses text-purple-600"></i> Acessórios / Chapéus / Bolsas
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /* APP STATE STORAGE */
-        let state = {
-            isWardrobeOpen: false,
-            clothes: [],
-            savedLooks: [],
-            activeOverlayId: null,
-            pendingImageSrc: null,
-            activeCategoryFilter: 'all',
-            activeOccasionFilter: 'all',
-            nextClothingId: 1,
-            nextLookId: 1
-        };
-
-        // DEFAULT CLOTHES DATA (SVG Placeholder Graphics for immediate playability)
-        const DEFAULT_CLOTHES = [
-            { id: 'def-1', name: 'Camiseta Branca', category: 'Tops', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="1.5"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2 h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z" fill="%23ffffff"/></svg>' },
-            { id: 'def-2', name: 'Calça Jeans', category: 'Bottoms', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%231e3a8a" stroke-width="1.5"><path d="M6 2h12v4L17 22h-4l-1-10-1 10H7L6 6V2z" fill="%233b82f6"/></svg>' },
-            { id: 'def-3', name: 'Jaqueta Roxa', category: 'Tops', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%23581c87" stroke-width="1.5"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2 h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z" fill="%23a855f7"/></svg>' },
-            { id: 'def-4', name: 'Óculos Escuros', category: 'Accessories', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="1.5"><circle cx="6" cy="12" r="4" fill="%23334155"/><circle cx="18" cy="12" r="4" fill="%23334155"/><path d="M10 12h4M2 10l2 2M22 10l-2 2"/></svg>' },
-            { id: 'def-5', name: 'Tênis Esportivo', category: 'Shoes', image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 24 24" fill="none" stroke="%230f172a" stroke-width="1.5"><path d="M2 16l3-6 5 1 8-2 4 4v3H2v-0z" fill="%23ef4444"/></svg>' }
-        ];
-
-        /* INITIALIZATION */
-        window.addEventListener('DOMContentLoaded', () => {
-            loadLocalStorageData();
-            setupEventListeners();
-            renderClothesGrid();
-            renderSavedLooks();
-        });
-
-        /* LOCALSTORAGE PERSISTENCE */
-        function loadLocalStorageData() {
-            const savedClothes = localStorage.getItem('pv_clothes');
-            const savedLooks = localStorage.getItem('pv_looks');
-
-            if (savedClothes) {
-                state.clothes = JSON.parse(savedClothes);
-            } else {
-                state.clothes = DEFAULT_CLOTHES;
-                saveClothesToStorage();
-            }
-
-            if (savedLooks) {
-                state.savedLooks = JSON.parse(savedLooks);
-            }
-
-            updateLooksCount();
-        }
-
-        function saveClothesToStorage() {
-            localStorage.setItem('pv_clothes', JSON.stringify(state.clothes));
-        }
-
-        function saveLooksToStorage() {
-            localStorage.setItem('pv_looks', JSON.stringify(state.savedLooks));
-            updateLooksCount();
-        }
-
-        function updateLooksCount() {
-            document.getElementById('looks-count').textContent = state.savedLooks.length;
-        }
-
-        /* WARDROBE DOOR ANIMATION LOGIC */
-        function toggleWardrobeDoors() {
-            const container = document.getElementById('wardrobe-container');
-            const doorsLayer = document.getElementById('doors-layer');
-            const interior = document.getElementById('wardrobe-interior');
-            const toggleBtn = document.getElementById('btn-toggle-wardrobe');
-            const centerBtn = document.getElementById('doors-center-btn');
-
-            state.isWardrobeOpen = !state.isWardrobeOpen;
-
-            if (state.isWardrobeOpen) {
-                container.classList.add('wardrobe-open');
-                centerBtn.classList.add('opacity-0', 'pointer-events-none');
-                
-                setTimeout(() => {
-                    doorsLayer.classList.add('pointer-events-none');
-                    interior.classList.remove('opacity-0', 'pointer-events-none');
-                    toggleBtn.classList.remove('hidden');
-                }, 400);
-            } else {
-                interior.classList.add('opacity-0', 'pointer-events-none');
-                doorsLayer.classList.remove('pointer-events-none');
-                container.classList.remove('wardrobe-open');
-                centerBtn.classList.remove('opacity-0', 'pointer-events-none');
-                toggleBtn.classList.add('hidden');
-            }
-        }
-
-        /* EVENT LISTENERS SETUP */
-        function setupEventListeners() {
-            // Toggle Wardrobe Button in Header
-            document.getElementById('btn-toggle-wardrobe').addEventListener('click', toggleWardrobeDoors);
-
-            // User Photo Upload
-            document.getElementById('input-person-photo').addEventListener('change', handlePersonPhotoUpload);
-
-            // Clear Fitting Room Canvas
-            document.getElementById('btn-clear-canvas').addEventListener('click', clearFittingStage);
-
-            // Clothing Upload
-            document.getElementById('input-clothing-photo').addEventListener('change', handleClothingPhotoUpload);
-
-            // Select Category Modal Handlers
-            document.querySelectorAll('.select-category-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const category = e.currentTarget.getAttribute('data-cat');
-                    confirmAddClothing(category);
-                });
-            });
-
-            // Category Filter Buttons
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active', 'bg-purple-600', 'text-white'));
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300'));
-                    
-                    e.currentTarget.classList.add('active', 'bg-purple-600', 'text-white');
-                    e.currentTarget.classList.remove('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
-                    
-                    state.activeCategoryFilter = e.currentTarget.getAttribute('data-cat');
-                    renderClothesGrid();
-                });
-            });
-
-            // Tabs Switch
-            document.getElementById('tab-btn-closet').addEventListener('click', () => switchTab('closet'));
-            document.getElementById('tab-btn-looks').addEventListener('click', () => switchTab('looks'));
-
-            // Item Overlay Scale Slider Control
-            document.getElementById('control-scale').addEventListener('input', (e) => {
-                if (state.activeOverlayId) {
-                    const el = document.getElementById(state.activeOverlayId);
-                    if (el) {
-                        const scale = e.target.value;
-                        el.dataset.scale = scale;
-                        updateElementTransform(el);
-                    }
-                }
-            });
-
-            // Layer Controls
-            document.getElementById('btn-item-layer-up').addEventListener('click', () => adjustLayer(1));
-            document.getElementById('btn-item-layer-down').addEventListener('click', () => adjustLayer(-1));
-            document.getElementById('btn-item-delete').addEventListener('click', deleteActiveOverlay);
-
-            // Save Look
-            document.getElementById('btn-save-look').addEventListener('click', saveCurrentLook);
-
-            // Filter Looks Occasion
-            document.getElementById('filter-occasion').addEventListener('change', (e) => {
-                state.activeOccasionFilter = e.target.value;
-                renderSavedLooks();
-            });
-
-            // Theme Modal Listeners
-            document.getElementById('btn-open-theme').addEventListener('click', openThemeModal);
-            document.getElementById('btn-close-theme').addEventListener('click', closeThemeModal);
-            document.getElementById('btn-apply-theme').addEventListener('click', closeThemeModal);
-
-            document.getElementById('picker-bg').addEventListener('input', (e) => {
-                document.documentElement.style.setProperty('--color-bg', e.target.value);
-            });
-            document.getElementById('picker-primary').addEventListener('input', (e) => {
-                document.documentElement.style.setProperty('--color-primary', e.target.value);
-            });
-
-            document.querySelectorAll('.preset-theme-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const bg = e.currentTarget.getAttribute('data-bg');
-                    const primary = e.currentTarget.getAttribute('data-primary');
-                    document.documentElement.style.setProperty('--color-bg', bg);
-                    document.documentElement.style.setProperty('--color-primary', primary);
-                    document.getElementById('picker-bg').value = bg;
-                    document.getElementById('picker-primary').value = primary;
-                });
-            });
-        }
-
-        /* PERSON PHOTO HANDLER */
-        function handlePersonPhotoUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = document.getElementById('person-img');
-                    img.src = event.target.result;
-                    img.classList.remove('hidden');
-                    document.getElementById('person-placeholder').classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        /* CLOTHING PHOTO UPLOAD */
-        function handleClothingPhotoUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    state.pendingImageSrc = event.target.result;
-                    openCategoryModal();
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function openCategoryModal() {
-            const modal = document.getElementById('modal-category');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function confirmAddClothing(category) {
-            if (state.pendingImageSrc) {
-                const newItem = {
-                    id: 'item-' + Date.now(),
-                    name: `Peça ${state.clothes.length + 1}`,
-                    category: category,
-                    image: state.pendingImageSrc
-                };
-                state.clothes.unshift(newItem);
-                saveClothesToStorage();
-                renderClothesGrid();
-                state.pendingImageSrc = null;
-            }
-            const modal = document.getElementById('modal-category');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        }
-
-        /* RENDER CLOTHES GALLERY GRID */
-        function renderClothesGrid() {
-            const grid = document.getElementById('clothes-grid');
-            grid.innerHTML = '';
-
-            const filtered = state.activeCategoryFilter === 'all' 
-                ? state.clothes 
-                : state.clothes.filter(c => c.category === state.activeCategoryFilter);
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-3 text-center py-8 text-xs text-slate-400">Nenhuma peça nesta categoria.</div>`;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'group relative aspect-square bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-2 flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 hover:shadow-md transition';
-                
-                card.innerHTML = `
-                    <img src="${item.image}" class="max-h-full max-w-full object-contain pointer-events-none">
-                    <button class="btn-delete-item absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] opacity-0 group-hover:opacity-100 transition flex items-center justify-center" title="Excluir">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
-
-                // Add item to overlay canvas on click
-                card.addEventListener('click', (e) => {
-                    if (!e.target.closest('.btn-delete-item')) {
-                        addClothingToStage(item);
-                    }
-                });
-
-                // Delete clothing item from wardrobe
-                card.querySelector('.btn-delete-item').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    state.clothes = state.clothes.filter(c => c.id !== item.id);
-                    saveClothesToStorage();
-                    renderClothesGrid();
-                });
-
-                grid.appendChild(card);
-            });
-        }
-
-        /* FITTING STAGE OVERLAY OVERLAY INTERACTION LOGIC */
-        function addClothingToStage(clothingItem) {
-            const container = document.getElementById('clothing-overlay-container');
-            const overlayId = 'overlay-' + Date.now();
-
-            const wrapper = document.createElement('div');
-            wrapper.id = overlayId;
-            wrapper.className = 'clothing-overlay absolute cursor-move flex items-center justify-center';
-            wrapper.style.left = '30%';
-            wrapper.style.top = '30%';
-            wrapper.style.zIndex = '10';
-            wrapper.dataset.scale = '1';
-            wrapper.dataset.rotation = '0';
-
-            const img = document.createElement('img');
-            img.src = clothingItem.image;
-            img.className = 'w-32 h-auto pointer-events-none';
-
-            wrapper.appendChild(img);
-            container.appendChild(wrapper);
-
-            makeDraggableAndSelectable(wrapper);
-            setActiveOverlay(overlayId);
-        }
-
-        function makeDraggableAndSelectable(element) {
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
-
-            const onStart = (e) => {
-                e.preventDefault();
-                setActiveOverlay(element.id);
-                isDragging = true;
-
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                startX = clientX;
-                startY = clientY;
-
-                initialLeft = element.offsetLeft;
-                initialTop = element.offsetTop;
-
-                document.addEventListener('mousemove', onMove);
-                document.addEventListener('mouseup', onEnd);
-                document.addEventListener('touchmove', onMove, { passive: false });
-                document.addEventListener('touchend', onEnd);
-            };
-
-            const onMove = (e) => {
-                if (!isDragging) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                const deltaX = clientX - startX;
-                const deltaY = clientY - startY;
-
-                element.style.left = `${initialLeft + deltaX}px`;
-                element.style.top = `${initialTop + deltaY}px`;
-            };
-
-            const onEnd = () => {
-                isDragging = false;
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onEnd);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend', onEnd);
-            };
-
-            element.addEventListener('mousedown', onStart);
-            element.addEventListener('touchstart', onStart, { passive: false });
-        }
-
-        function setActiveOverlay(id) {
-            document.querySelectorAll('.clothing-overlay').forEach(el => el.classList.remove('active'));
-            state.activeOverlayId = id;
-
-            const controls = document.getElementById('item-controls');
-            if (id) {
-                const activeEl = document.getElementById(id);
-                if (activeEl) {
-                    activeEl.classList.add('active');
-                    controls.classList.remove('opacity-50', 'pointer-events-none');
-                    document.getElementById('control-scale').value = activeEl.dataset.scale || 1;
-                }
-            } else {
-                controls.classList.add('opacity-50', 'pointer-events-none');
-            }
-        }
-
-        function updateElementTransform(el) {
-            const scale = el.dataset.scale || 1;
-            el.style.transform = `scale(${scale})`;
-        }
-
-        function adjustLayer(direction) {
-            if (!state.activeOverlayId) return;
-            const el = document.getElementById(state.activeOverlayId);
-            if (el) {
-                let currentZ = parseInt(el.style.zIndex || 10);
-                el.style.zIndex = Math.max(1, currentZ + direction);
-            }
-        }
-
-        function deleteActiveOverlay() {
-            if (!state.activeOverlayId) return;
-            const el = document.getElementById(state.activeOverlayId);
-            if (el) {
-                el.remove();
-                setActiveOverlay(null);
-            }
-        }
-
-        function clearFittingStage() {
-            document.getElementById('clothing-overlay-container').innerHTML = '';
-            setActiveOverlay(null);
-        }
-
-        /* SAVED LOOKS MANAGEMENT */
-        function saveCurrentLook() {
-            const nameInput = document.getElementById('input-look-name');
-            const occasionSelect = document.getElementById('select-look-occasion');
-
-            const name = nameInput.value.trim() || `Look ${state.savedLooks.length + 1}`;
-            const occasion = occasionSelect.value;
-
-            // Capture item positions
-            const overlays = [];
-            document.querySelectorAll('.clothing-overlay').forEach(el => {
-                const img = el.querySelector('img');
-                overlays.push({
-                    image: img.src,
-                    left: el.style.left,
-                    top: el.style.top,
-                    scale: el.dataset.scale || 1,
-                    zIndex: el.style.zIndex || 10
-                });
-            });
-
-            if (overlays.length === 0) {
-                alert('Adicione pelo menos uma peça ao provador para salvar um look!');
-                return;
-            }
-
-            const newLook = {
-                id: 'look-' + Date.now(),
-                name: name,
-                occasion: occasion,
-                date: new Date().toLocaleDateString('pt-BR'),
-                overlays: overlays
-            };
-
-            state.savedLooks.unshift(newLook);
-            saveLooksToStorage();
-            renderSavedLooks();
-
-            nameInput.value = '';
-            switchTab('looks');
-        }
-
-        function renderSavedLooks() {
-            const container = document.getElementById('looks-list');
-            container.innerHTML = '';
-
-            const filtered = state.activeOccasionFilter === 'all'
-                ? state.savedLooks
-                : state.savedLooks.filter(l => l.occasion === state.activeOccasionFilter);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-xs text-slate-400">Nenhum look salvo nesta ocasião.</div>`;
-                return;
-            }
-
-            filtered.forEach(look => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-50 dark:bg-slate-900 rounded-xl p-3 border border-slate-200 dark:border-slate-700 flex flex-col gap-2';
-                
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h4 class="font-bold text-xs text-slate-800 dark:text-slate-100">${look.name}</h4>
-                            <span class="text-[10px] text-purple-600 bg-purple-50 dark:bg-purple-900/30 px-2 py-0.5 rounded-full font-medium">${look.occasion}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <button class="btn-load-look p-1.5 rounded-lg bg-purple-600 text-white text-xs hover:bg-purple-700" title="Carregar no Provador">
-                                <i class="fa-solid fa-shirt"></i>
-                            </button>
-                            <button class="btn-delete-look p-1.5 rounded-lg bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300 text-xs hover:bg-red-200" title="Excluir">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1 overflow-x-auto py-1">
-                        ${look.overlays.map(o => `<img src="${o.image}" class="w-8 h-8 object-contain bg-white dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">`).join('')}
-                    </div>
-                `;
-
-                // Load Look onto fitting canvas
-                card.querySelector('.btn-load-look').addEventListener('click', () => {
-                    clearFittingStage();
-                    const stage = document.getElementById('clothing-overlay-container');
-                    
-                    look.overlays.forEach(item => {
-                        const wrapper = document.createElement('div');
-                        wrapper.id = 'overlay-' + Date.now() + Math.random();
-                        wrapper.className = 'clothing-overlay absolute cursor-move flex items-center justify-center';
-                        wrapper.style.left = item.left;
-                        wrapper.style.top = item.top;
-                        wrapper.style.zIndex = item.zIndex;
-                        wrapper.dataset.scale = item.scale;
-
-                        const img = document.createElement('img');
-                        img.src = item.image;
-                        img.className = 'w-32 h-auto pointer-events-none';
-
-                        wrapper.appendChild(img);
-                        stage.appendChild(wrapper);
-
-                        makeDraggableAndSelectable(wrapper);
-                        updateElementTransform(wrapper);
-                    });
-                });
-
-                // Delete Saved Look
-                card.querySelector('.btn-delete-look').addEventListener('click', () => {
-                    state.savedLooks = state.savedLooks.filter(l => l.id !== look.id);
-                    saveLooksToStorage();
-                    renderSavedLooks();
-                });
-
-                container.appendChild(card);
-            });
-        }
-
-        /* TABS NAVIGATION */
-        function switchTab(tab) {
-            const btnCloset = document.getElementById('tab-btn-closet');
-            const btnLooks = document.getElementById('tab-btn-looks');
-            const contentCloset = document.getElementById('tab-content-closet');
-            const contentLooks = document.getElementById('tab-content-looks');
-
-            if (tab === 'closet') {
-                btnCloset.classList.add('border-purple-600', 'text-purple-600', 'dark:text-purple-400', 'font-bold');
-                btnCloset.classList.remove('border-transparent', 'text-slate-500');
-                btnLooks.classList.remove('border-purple-600', 'text-purple-600', 'dark:text-purple-400', 'font-bold');
-                btnLooks.classList.add('border-transparent', 'text-slate-500');
-
-                contentCloset.classList.remove('hidden');
-                contentLooks.classList.add('hidden');
-            } else {
-                btnLooks.classList.add('border-purple-600', 'text-purple-600', 'dark:text-purple-400', 'font-bold');
-                btnLooks.classList.remove('border-transparent', 'text-slate-500');
-                btnCloset.classList.remove('border-purple-600', 'text-purple-600', 'dark:text-purple-400', 'font-bold');
-                btnCloset.classList.add('border-transparent', 'text-slate-500');
-
-                contentLooks.classList.remove('hidden');
-                contentCloset.classList.add('hidden');
-            }
-        }
-
-        /* MODAL HELPERS */
-        function openThemeModal() {
-            const modal = document.getElementById('modal-theme');
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-        function closeThemeModal() {
-            const modal = document.getElementById('modal-theme');
-            modal.classList.add('opacity-0', 'pointer-events-none');
-        }
-    </script>
-</body>
-</html>
