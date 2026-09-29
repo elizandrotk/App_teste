@@ -5,20 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provador Virtual & Guarda-Roupa Digital</title>
     
-    <!-- Tailwind CSS CDN para estilização rápida -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Font Awesome para ícones -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- ESTILOS CUSTOMIZADOS (CSS) --- */
-        
         :root {
-            /* Variáveis de cor controladas pelo JavaScript */
             --bg-primary: #f4f1ea;
             --btn-primary: #8b5cf6;
             --btn-primary-hover: #7c3aed;
@@ -32,7 +29,6 @@
             transition: background-color 0.3s ease;
         }
 
-        /* Botão principal customizado */
         .btn-main {
             background-color: var(--btn-primary);
             color: white;
@@ -45,7 +41,6 @@
             transform: scale(0.98);
         }
 
-        /* Estilo para inputs de cor */
         input[type="color"] {
             -webkit-appearance: none;
             border: none;
@@ -62,47 +57,53 @@
             border-radius: 50%;
         }
 
-        /* Painel do provador (palco) */
         #stage-canvas {
             border: 2px dashed #cbd5e1;
             background-color: #ffffff;
-            /* Garante que o usuário possa clicar e arrastar */
             touch-action: none; 
         }
 
-        /* Peças de roupa sobrepostas no corpo */
         .overlay-item {
             position: absolute;
-            cursor: move; /* Cursor de "mudar de posição" */
-            user-select: none; /* Impede seleção de texto acidental ao arrastar */
-            /* Transição suave apenas para quando a peça é solta, para não lagar o drag */
+            cursor: move;
+            user-select: none;
             transition: box-shadow 0.2s ease; 
         }
 
-        /* Destaque quando a peça está sendo arrastada */
         .overlay-item.dragging {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             opacity: 0.9;
         }
 
-        /* Miniaturas na lista de roupas */
+        .clothing-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            transition: all 0.2s ease;
+        }
+        .clothing-card:hover {
+            border-color: var(--btn-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
         .clothing-thumb {
             width: 100%;
             height: 80px;
-            object-fit: contain; /* Garante que a roupa inteira apareça sem cortar */
+            object-fit: contain;
             background-color: #f8fafc;
             border-radius: 8px;
-            border: 2px solid #e2e8f0;
             cursor: pointer;
-            transition: border-color 0.2s ease, transform 0.2s ease;
         }
 
-        .clothing-thumb:hover {
-            border-color: var(--btn-primary);
-            transform: translateY(-2px);
+        .tag-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: 600;
         }
 
-        /* Esconder elementos */
         .hidden {
             display: none !important;
         }
@@ -110,19 +111,19 @@
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-6">
 
-    <!-- --- CABEÇALHO --- -->
-    <header class="flex items-center justify-between pb-6 border-b border-slate-200 mb-6">
+    <!-- CABEÇALHO -->
+    <header class="flex flex-col sm:flex-row items-center justify-between pb-6 border-b border-slate-200 mb-6 gap-4">
         <div class="flex items-center gap-3">
             <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-purple-500/30">
                 <i class="fa-solid fa-shirt"></i>
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
-                <p class="text-sm text-slate-500">Guarda-Roupa Digital Interativo</p>
+                <p class="text-sm text-slate-500">Guarda-Roupa Digital & Estilos por Evento</p>
             </div>
         </div>
         
-        <!-- PAINEL DE CORES (Personalização) -->
+        <!-- PAINEL DE CORES -->
         <div class="flex items-center gap-4 bg-white p-3 rounded-full shadow-inner border border-slate-100">
             <div class="flex items-center gap-2">
                 <label for="bg-color" class="text-xs font-semibold text-slate-500">Fundo:</label>
@@ -135,15 +136,14 @@
         </div>
     </header>
 
-    <!-- --- CONTEÚDO PRINCIPAL --- -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 max-w-7xl w-full mx-auto">
         
-        <!-- SEÇÃO DO ROUPEIRO (Guarda-Roupa) -->
+        <!-- ROUPEIRO -->
         <div id="wardrobe-container" class="relative bg-white p-6 rounded-3xl shadow-xl border border-slate-100 min-h-[500px]">
             
-            <!-- PORTAS DO GUARDA-ROUPA (Layer Superior) -->
+            <!-- PORTAS DO GUARDA-ROUPA -->
             <div id="doors-layer" class="absolute inset-0 bg-slate-900 rounded-3xl flex flex-col items-center justify-center z-20 transition-opacity duration-500">
-                <!-- Visual de madeira simples -->
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern-3.png')] opacity-30 rounded-3xl"></div>
                 
                 <div class="relative z-10 text-center p-8">
@@ -151,7 +151,7 @@
                         <i class="fa-solid fa-door-closed"></i>
                     </div>
                     <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
-                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Abra as portas para visualizar suas roupas, criar combinações e experimentar looks no provador virtual.</p>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Abra as portas para visualizar suas roupas, separar por estação e criar looks para cada tipo de evento.</p>
                     <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
                         <i class="fa-solid fa-door-open"></i>
                         Abrir Guarda-Roupa
@@ -159,76 +159,114 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO INTERNO (Aparece após abrir) -->
+            <!-- CONTEÚDO INTERNO -->
             <div id="wardrobe-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- COLUNA ESQUERDA: PROVADOR (Palco) -->
+                <!-- PROVADOR (Esquerda) -->
                 <div class="lg:col-span-2 flex flex-col gap-4">
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
                         <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800">
                             <i class="fa-solid fa-user-check text-purple-600"></i>
                             Provador Virtual
                         </h3>
                         <div class="flex gap-2">
-                            <!-- Input Escondido para Upload do Avatar -->
                             <input type="file" id="person-upload" accept="image/*" class="hidden">
-                            <button onclick="document.getElementById('person-upload').click()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 flex items-center gap-2 transition">
+                            <button onclick="document.getElementById('person-upload').click()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2 transition">
                                 <i class="fa-solid fa-camera"></i>
                                 Alterar Foto
                             </button>
-                            <button id="btn-clear-canvas" class="px-4 py-2 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-semibold text-red-600 flex items-center gap-2 transition">
+                            <button id="btn-clear-canvas" class="px-3 py-2 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-semibold text-red-600 flex items-center gap-2 transition">
                                 <i class="fa-solid fa-trash-can"></i>
                                 Limpar
                             </button>
                         </div>
                     </div>
 
-                    <!-- PALCO / TELAS (Onde a mágica acontece) -->
+                    <!-- PALCO -->
                     <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
-                        
-                        <!-- Mensagem inicial (Placeholder) -->
                         <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
                             <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
                             <p class="font-semibold">Carregue uma foto de corpo inteiro para começar</p>
-                            <p class="text-xs max-w-xs">Para melhores resultados, use uma foto com fundo neutro e boa iluminação.</p>
+                            <p class="text-xs max-w-xs">Arraste as peças de roupa sobre a foto para criar a combinação ideal.</p>
                         </div>
 
-                        <!-- Imagem do Corpo Base (Avatar) -->
                         <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
-
-                        <!-- CONTAINER PARA PEÇAS SOBREPOSTAS -->
-                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto">
-                            <!-- As roupas adicionadas aparecerão aqui via JavaScript -->
-                        </div>
+                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto"></div>
                     </div>
                 </div>
 
-                <!-- COLUNA DIREITA: CLOSET (Lista de Roupas) -->
+                <!-- CLOSET E FILTROS (Direita) -->
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col gap-4">
                     <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800">
                         <i class="fa-solid fa-box-archive text-purple-600"></i>
-                        Seu Closet
+                        Seu Closet Digital
                     </h3>
-                    
-                    <p class="text-sm text-slate-500 mb-2">Adicione novas peças ao seu closet e clique nelas para experimentá-las no provador.</p>
 
-                    <!-- Botão para Upload de Nova Roupa -->
-                    <div class="relative">
+                    <!-- PAINEL DE ADICIONAR NOVA PEÇA -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col gap-3 shadow-sm">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Nova Peça</span>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] font-semibold text-slate-500">Estação:</label>
+                                <select id="new-season" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
+                                    <option value="todas">Todas</option>
+                                    <option value="verao">Verão ☀️</option>
+                                    <option value="outono">Outono 🍂</option>
+                                    <option value="inverno">Inverno ❄️️</option>
+                                    <option value="primavera">Primavera 🌸</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-semibold text-slate-500">Evento Social:</label>
+                                <select id="new-event" class="w-full text-xs p-2 border rounded-lg bg-slate-50">
+                                    <option value="casual">Casual</option>
+                                    <option value="trabalho">Trabalho</option>
+                                    <option value="festa">Festa / Gala</option>
+                                    <option value="esporte">Esporte</option>
+                                    <option value="encontro">Encontro</option>
+                                    <option value="praia">Praia / Pool</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <input type="file" id="clothing-upload" accept="image/*" class="hidden">
-                        <button onclick="document.getElementById('clothing-upload').click()" class="btn-main w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow shadow-purple-500/20">
+                        <button onclick="document.getElementById('clothing-upload').click()" class="btn-main w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow shadow-purple-500/20 mt-1">
                             <i class="fa-solid fa-plus"></i>
-                            Adicionar Nova Peça
+                            Adicionar Imagem
                         </button>
                     </div>
 
-                    <div class="border-t border-slate-200 my-2"></div>
+                    <!-- FILTROS DO CLOSET -->
+                    <div class="flex flex-col gap-2 pt-2 border-t border-slate-200">
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Filtrar Estilos</span>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="filter-season" class="text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
+                                <option value="todas">☀️ Todas as Estações</option>
+                                <option value="verao">Verão</option>
+                                <option value="outono">Outono</option>
+                                <option value="inverno">Inverno</option>
+                                <option value="primavera">Primavera</option>
+                            </select>
 
-                    <!-- LISTA DE ROUPAS (GRID) -->
-                    <div id="clothing-list" class="grid grid-cols-3 gap-3 overflow-y-auto pr-2 max-h-[400px]">
-                        <!-- Placeholders de exemplo -->
-                        <div class="text-center col-span-3 py-8 text-slate-400 flex flex-col items-center gap-3">
-                            <i class="fa-solid fa-tags text-4xl"></i>
-                            <p class="text-xs font-medium">Nenhuma peça adicionada ainda.</p>
+                            <select id="filter-event" class="text-xs p-2 border rounded-lg bg-white font-medium text-slate-700">
+                                <option value="todos">🎉 Todos os Eventos</option>
+                                <option value="casual">Casual</option>
+                                <option value="trabalho">Trabalho</option>
+                                <option value="festa">Festa / Gala</option>
+                                <option value="esporte">Esporte</option>
+                                <option value="encontro">Encontro</option>
+                                <option value="praia">Praia / Pool</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- LISTA DE ROUPAS -->
+                    <div id="clothing-list" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 max-h-[320px] pt-2">
+                        <div class="text-center col-span-2 py-8 text-slate-400 flex flex-col items-center gap-2">
+                            <i class="fa-solid fa-tags text-3xl"></i>
+                            <p class="text-xs font-medium">Nenhuma peça encontrada.</p>
                         </div>
                     </div>
                 </div>
@@ -238,51 +276,40 @@
 
     </main>
 
-    <!-- --- RODAPÉ --- -->
-    <footer class="mt-12 pt-6 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v1.0 | Desenvolvido para facilitar seu estilo digital.
+    <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
+        Provador Virtual v2.0 | Organização por Estação & Evento Social
     </footer>
 
-    <!-- --- JAVASCRIPT (Lógica) --- -->
+    <!-- JAVASCRIPT -->
     <script>
-        // --- 1. CONFIGURAÇÃO DE CORES (CSS Variables) ---
+        // --- 1. CONFIGURAÇÃO DE CORES ---
         const bgColorInput = document.getElementById('bg-color');
         const btnColorInput = document.getElementById('btn-color');
 
-        // Altera a cor de fundo do corpo
         bgColorInput.addEventListener('input', (e) => {
             document.documentElement.style.setProperty('--bg-primary', e.target.value);
         });
 
-        // Altera a cor principal dos botões e destaques
         btnColorInput.addEventListener('input', (e) => {
             const newColor = e.target.value;
             document.documentElement.style.setProperty('--btn-primary', newColor);
-            
-            // Gera automaticamente uma cor mais escura para o hover (simplificado)
-            // Para um app real, usaríamos uma função de manipulação de cor (ex: tinycolor)
             document.documentElement.style.setProperty('--btn-primary-hover', newColor + 'dd'); 
         });
 
-
-        // --- 2. LÓGICA DE ABRIR O ROUPEIRO ---
+        // --- 2. ABRIR GUARDA-ROUPA ---
         const openBtn = document.getElementById('open-btn');
         const doorsLayer = document.getElementById('doors-layer');
         const wardrobeContent = document.getElementById('wardrobe-content');
 
         openBtn.addEventListener('click', () => {
-            // Efeito de fade out na porta
             doorsLayer.style.opacity = '0';
-            
-            // Espera a animação acabar para esconder de fato e mostrar o conteúdo
             setTimeout(() => {
                 doorsLayer.classList.add('hidden');
                 wardrobeContent.classList.remove('hidden');
             }, 500);
         });
 
-
-        // --- 3. UPLOAD DA FOTO DE CORPO INTEIRO (AVATAR) ---
+        // --- 3. UPLOAD DO AVATAR ---
         const personUpload = document.getElementById('person-upload');
         const personImg = document.getElementById('person-img');
         const placeholderText = document.getElementById('placeholder-text');
@@ -292,10 +319,7 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    // Define a imagem carregada como fonte do avatar
                     personImg.src = event.target.result;
-                    
-                    // Mostra a imagem e esconde o texto de ajuda
                     personImg.classList.remove('hidden');
                     placeholderText.classList.add('hidden');
                 };
@@ -303,107 +327,133 @@
             }
         });
 
+        // --- 4. BANCO DE DADOS LOCAL E RENDERIZAÇÃO DE ROUPAS ---
+        let clothesDatabase = []; // Guarda as peças adicionadas
 
-        // --- 4. UPLOAD E GERENCIAMENTO DE ROUPAS ---
         const clothingUpload = document.getElementById('clothing-upload');
         const clothingList = document.getElementById('clothing-list');
         const overlayContainer = document.getElementById('overlay-container');
         const btnClearCanvas = document.getElementById('btn-clear-canvas');
 
-        // Limpa todas as roupas do provador
+        const newSeasonSelect = document.getElementById('new-season');
+        const newEventSelect = document.getElementById('new-event');
+        const filterSeason = document.getElementById('filter-season');
+        const filterEvent = document.getElementById('filter-event');
+
         btnClearCanvas.addEventListener('click', () => {
             overlayContainer.innerHTML = '';
         });
 
-        // Quando o usuário seleciona uma imagem de roupa
         clothingUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                // Remove a mensagem de "vazio" se for a primeira peça
-                if (clothingList.querySelector('.col-span-3')) {
-                    clothingList.innerHTML = '';
-                }
-
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    const imgSrc = event.target.result;
-                    
-                    // A. Adiciona miniatura na lista de peças (Closet)
-                    const thumb = document.createElement('img');
-                    thumb.src = imgSrc;
-                    thumb.className = 'clothing-thumb';
-                    thumb.title = 'Clique para experimentar';
-                    
-                    // B. Evento: Ao clicar na miniatura, adiciona a roupa no provador
-                    thumb.addEventListener('click', () => {
-                        addClothingToStage(imgSrc);
-                    });
+                    const newItem = {
+                        id: Date.now(),
+                        src: event.target.result,
+                        season: newSeasonSelect.value,
+                        event: newEventSelect.value
+                    };
 
-                    clothingList.appendChild(thumb);
+                    clothesDatabase.push(newItem);
+                    renderClothesList();
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Função para colocar a roupa sobre o corpo e permitir arrastar
+        // Renderiza as roupas conforme os filtros ativos
+        function renderClothesList() {
+            const seasonVal = filterSeason.value;
+            const eventVal = filterEvent.value;
+
+            const filtered = clothesDatabase.filter(item => {
+                const matchSeason = (seasonVal === 'todas') || (item.season === 'todas') || (item.season === seasonVal);
+                const matchEvent = (eventVal === 'todos') || (item.event === eventVal);
+                return matchSeason && matchEvent;
+            });
+
+            clothingList.innerHTML = '';
+
+            if (filtered.length === 0) {
+                clothingList.innerHTML = `
+                    <div class="text-center col-span-2 py-8 text-slate-400 flex flex-col items-center gap-2">
+                        <i class="fa-solid fa-filter-circle-xmark text-3xl"></i>
+                        <p class="text-xs font-medium">Nenhuma peça corresponde aos filtros.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'clothing-card flex flex-col gap-1.5';
+
+                const thumb = document.createElement('img');
+                thumb.src = item.src;
+                thumb.className = 'clothing-thumb';
+                thumb.title = 'Clique para experimentar';
+                thumb.addEventListener('click', () => addClothingToStage(item.src));
+
+                const tagsDiv = document.createElement('div');
+                tagsDiv.className = 'flex flex-wrap gap-1 mt-1';
+                
+                tagsDiv.innerHTML = `
+                    <span class="tag-badge bg-amber-100 text-amber-800">${item.season}</span>
+                    <span class="tag-badge bg-purple-100 text-purple-800">${item.event}</span>
+                `;
+
+                card.appendChild(thumb);
+                card.appendChild(tagsDiv);
+                clothingList.appendChild(card);
+            });
+        }
+
+        filterSeason.addEventListener('change', renderClothesList);
+        filterEvent.addEventListener('change', renderClothesList);
+
+        // --- 5. ADICIONAR PEÇA AO PROVADOR ---
         function addClothingToStage(src) {
             const item = document.createElement('img');
             item.src = src;
             item.className = 'overlay-item';
-            
-            // Posição inicial padrão (centro do palco)
             item.style.top = '150px';
             item.style.left = '150px';
-            // Largura padrão inicial da peça
-            item.style.width = '150px'; 
+            item.style.width = '140px'; 
 
-            // Torna a imagem arrastável
             makeDraggable(item);
 
-            // Adiciona opção de remover com clique duplo
-            item.addEventListener('dblclick', () => {
-                item.remove();
-            });
+            item.addEventListener('dblclick', () => item.remove());
             item.title = 'Arraste para posicionar. Clique duplo para remover.';
 
             overlayContainer.appendChild(item);
         }
 
-
-        // --- 5. LÓGICA DE ARRASTAR E SOLTAR (DRAG & DROP) ---
-        // Suporta Mouse e Touch (Celular)
+        // --- 6. DRAG & DROP ---
         function makeDraggable(element) {
             let isDragging = false;
-            let currentX;
-            let currentY;
-            let initialX;
-            let initialY;
-            let xOffset = 0;
-            let yOffset = 0;
+            let currentX, currentY, initialX, initialY;
+            let xOffset = 0, yOffset = 0;
 
             const stage = document.getElementById('stage-canvas');
 
-            // Eventos de Mouse
             element.addEventListener('mousedown', dragStart);
             stage.addEventListener('mousemove', drag);
             stage.addEventListener('mouseup', dragEnd);
-            stage.addEventListener('mouseleave', dragEnd); // Garante que para se sair do palco
+            stage.addEventListener('mouseleave', dragEnd);
 
-            // Eventos de Touch (Celular)
             element.addEventListener('touchstart', dragStart, { passive: false });
             stage.addEventListener('touchmove', drag, { passive: false });
             stage.addEventListener('touchend', dragEnd);
 
-            // Recupera posição inicial da peça se ela já foi movida antes (para quando renderizar de novo)
             if (element.style.left && element.style.top) {
                 xOffset = parseInt(element.style.left);
                 yOffset = parseInt(element.style.top);
             }
 
             function dragStart(e) {
-                // Impede comportamento padrão (como scroll no celular)
                 if (e.type === 'touchstart') {
-                    // e.preventDefault(); 
                     initialX = e.touches[0].clientX - xOffset;
                     initialY = e.touches[0].clientY - yOffset;
                 } else {
@@ -414,15 +464,13 @@
                 if (e.target === element) {
                     isDragging = true;
                     element.classList.add('dragging');
-                    // Traz a peça para a frente (z-index maior que as outras)
                     bringToFront(element);
                 }
             }
 
             function drag(e) {
                 if (isDragging) {
-                    e.preventDefault(); // Impede scroll no celular enquanto arrasta
-
+                    e.preventDefault();
                     if (e.type === 'touchmove') {
                         currentX = e.touches[0].clientX - initialX;
                         currentY = e.touches[0].clientY - initialY;
@@ -430,33 +478,23 @@
                         currentX = e.clientX - initialX;
                         currentY = e.clientY - initialY;
                     }
-
                     xOffset = currentX;
                     yOffset = currentY;
-
-                    setTranslate(currentX, currentY, element);
+                    element.style.left = currentX + 'px';
+                    element.style.top = currentY + 'px';
                 }
             }
 
-            function dragEnd(e) {
+            function dragEnd() {
                 initialX = currentX;
                 initialY = currentY;
-
                 isDragging = false;
                 element.classList.remove('dragging');
             }
 
-            function setTranslate(xPos, yPos, el) {
-                el.style.left = xPos + 'px';
-                el.style.top = yPos + 'px';
-            }
-            
-            // Função auxiliar para trazer a peça clicada para frente
             function bringToFront(el) {
                 const items = overlayContainer.querySelectorAll('.overlay-item');
-                // Reseta z-index de todos
                 items.forEach(item => item.style.zIndex = '10');
-                // Define z-index alto para o atual
                 el.style.zIndex = '20';
             }
         }
