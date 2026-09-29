@@ -53,7 +53,6 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* 3D Wardrobe Doors CSS Animation */
         .wardrobe-perspective {
             perspective: 1200px;
         }
@@ -76,7 +75,6 @@
             transform: rotateY(130deg);
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -89,24 +87,19 @@
             background: rgba(0,0,0,0.2);
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.3);
-        }
 
-        /* Draggable Overlay Clothes Styling */
         .clothing-overlay {
             touch-action: none;
             user-select: none;
             position: absolute;
             cursor: grab;
-            transform-origin: center center;
         }
 
         .clothing-overlay:active {
             cursor: grabbing;
         }
 
-        .clothing-overlay.active-item {
+        .clothing-overlay.active {
             outline: 2px dashed var(--color-primary);
             outline-offset: 4px;
             border-radius: 8px;
@@ -121,12 +114,6 @@
 
         .wood-panel {
             box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
-        }
-
-        /* Drag-and-drop highlight */
-        .drag-over {
-            border-color: #8b5cf6 !important;
-            background-color: rgba(139, 92, 246, 0.1) !important;
         }
     </style>
 </head>
@@ -159,26 +146,23 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8 flex flex-col gap-6">
 
-        <!-- WARDROBE CONTAINER WITH 3D DOORS -->
-        <div id="wardrobe-container" class="wardrobe-perspective relative w-full rounded-3xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-800 min-h-[680px] flex flex-col justify-center">
+        <!-- WARDROBE CONTAINER -->
+        <div id="wardrobe-container" class="wardrobe-perspective relative w-full rounded-3xl overflow-hidden bg-slate-900 shadow-2xl border border-slate-800 min-h-[640px] flex flex-col justify-center">
             
-            <!-- WARDROBE DOORS LAYER -->
+            <!-- DOORS LAYER -->
             <div id="doors-layer" class="absolute inset-0 z-20 flex w-full h-full pointer-events-auto">
-                <!-- Left Door -->
                 <div id="door-left" class="door-left w-1/2 h-full wood-texture wood-panel border-r-2 border-amber-950 flex flex-col justify-center items-end pr-4 sm:pr-8 relative">
                     <div class="w-4 sm:w-5 h-28 sm:h-36 bg-amber-200/90 rounded-full border border-amber-400/50 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
                         <div class="w-1.5 h-16 bg-amber-700/60 rounded-full"></div>
                     </div>
                 </div>
 
-                <!-- Right Door -->
                 <div id="door-right" class="door-right w-1/2 h-full wood-texture wood-panel border-l-2 border-amber-950 flex flex-col justify-center items-start pl-4 sm:pl-8 relative">
                     <div class="w-4 sm:w-5 h-28 sm:h-36 bg-amber-200/90 rounded-full border border-amber-400/50 shadow-xl flex items-center justify-center cursor-pointer hover:scale-105 transition" onclick="toggleWardrobeDoors()">
                         <div class="w-1.5 h-16 bg-amber-700/60 rounded-full"></div>
                     </div>
                 </div>
 
-                <!-- Open Button Center Overlay -->
                 <div id="doors-center-btn" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-xs z-30 transition-opacity duration-300">
                     <div class="text-center p-6 max-w-sm">
                         <div class="w-16 h-16 rounded-2xl bg-amber-600 text-white flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-900/50 text-2xl">
@@ -186,17 +170,17 @@
                         </div>
                         <h2 class="text-2xl font-bold text-white mb-2">Seu Roupeiro Digital</h2>
                         <p class="text-amber-100/80 text-sm mb-6">Abra as portas para montar looks, experimentar peças e organizar seu estilo.</p>
-                        <button onclick="toggleWardrobeDoors()" class="w-full py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/40 transform hover:-translate-y-0.5 active:translate-y-0 transition cursor-pointer">
+                        <button onclick="toggleWardrobeDoors()" class="w-full py-3.5 px-6 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-600/40 transform hover:-translate-y-0.5 active:translate-y-0 transition">
                             Abrir Guarda-Roupa
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- INTERIOR WARDROBE CONTENT -->
+            <!-- INTERIOR -->
             <div id="wardrobe-interior" class="relative z-10 w-full h-full bg-slate-100 dark:bg-slate-900 p-3 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 opacity-0 transition-opacity duration-500 pointer-events-none">
                 
-                <!-- LEFT COLUMN: PROVADOR VIRTUAL -->
+                <!-- PROVADOR -->
                 <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5 flex flex-col">
                     <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-700">
                         <div class="flex items-center gap-2">
@@ -204,134 +188,122 @@
                             <h2 class="font-bold text-slate-800 dark:text-slate-100">Provador Virtual</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                            <!-- NATIVE FILE INPUT WITH DEDICATED LABEL (CORRECTED & GUARANTEED COMPATIBILITY) -->
-                            <input type="file" id="input-person-photo" accept="image/*" class="hidden">
-                            <label for="input-person-photo" class="cursor-pointer text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-semibold px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-camera"></i>
-                                <span>Sua Foto</span>
-                            </label>
+                            <!-- BOTÃO FOTO CORPO INTEIRO (USANDO LABEL NATIVO) -->
+                            <div class="flex gap-2">
+                                <input type="file" id="input-person-photo" accept="image/*" class="hidden">
+                                <label for="input-person-photo" class="cursor-pointer text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-semibold px-3 py-1.5 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-camera"></i>
+                                    <span>Sua Foto</span>
+                                </label>
+                            </div>
                             
-                            <button id="btn-clear-canvas" class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition cursor-pointer" title="Remover roupas do corpo">
+                            <button id="btn-clear-canvas" class="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-200 transition" title="Remover roupas do corpo">
                                 Limpar Peças
                             </button>
                         </div>
                     </div>
 
-                    <!-- FITTING STAGE CANVAS AREA WITH DRAG & DROP SUPPORT -->
-                    <div id="fitting-stage" class="relative flex-1 w-full min-h-[420px] sm:min-h-[500px] bg-slate-50 dark:bg-slate-950 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center transition-all">
+                    <!-- FITTING ROOM STAGE -->
+                    <div id="fitting-stage" class="relative flex-1 w-full min-h-[420px] sm:min-h-[500px] bg-slate-50 dark:bg-slate-950 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center">
                         
-                        <!-- Placeholder when no photo -->
-                        <div id="person-placeholder" class="text-center p-6 flex flex-col items-center select-none">
+                        <!-- Placeholder com Label Nativo -->
+                        <label for="input-person-photo" id="person-placeholder" class="text-center p-6 flex flex-col items-center select-none cursor-pointer">
                             <div class="w-20 h-20 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3 shadow-inner">
-                                <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                                <i class="fa-solid fa-camera text-3xl"></i>
                             </div>
-                            <p class="font-bold text-slate-700 dark:text-slate-200 text-base mb-1">Carregue sua Foto de Corpo Inteiro</p>
-                            <p class="text-xs text-slate-400 max-w-xs mb-4">Arraste e solte uma imagem aqui ou clique no botão abaixo para selecionar do PC/Celular.</p>
-                            
-                            <label for="input-person-photo" class="cursor-pointer py-2.5 px-5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold shadow-md shadow-purple-500/20 transition flex items-center gap-2">
-                                <i class="fa-solid fa-upload"></i>
-                                <span>Selecionar Imagem</span>
-                            </label>
-                        </div>
+                            <p class="font-bold text-slate-700 dark:text-slate-200 text-base mb-1">Clique para carregar sua foto</p>
+                            <p class="text-xs text-slate-400 max-w-xs mb-4">Escolha uma foto de corpo inteiro do seu computador ou celular.</p>
+                            <span class="py-2.5 px-5 rounded-xl bg-purple-600 text-white text-xs font-semibold shadow-md shadow-purple-500/20 hover:bg-purple-700 transition">
+                                <i class="fa-solid fa-upload mr-1"></i> Carregar Foto do Dispositivo
+                            </span>
+                        </label>
 
                         <!-- Person Base Image -->
                         <img id="person-img" class="absolute inset-0 w-full h-full object-contain pointer-events-none hidden" alt="Sua Foto">
 
-                        <!-- OVERLAY CLOTHING ITEMS CONTAINER -->
+                        <!-- OVERLAY CONTAINER -->
                         <div id="clothing-overlay-container" class="absolute inset-0 pointer-events-auto">
-                            <!-- Dynamic Overlay Items Render Here -->
+                            <!-- Dynamic Overlay Items -->
                         </div>
                     </div>
 
-                    <!-- ACTIVE ITEM CONTROLS (SCALE / ROTATION / LAYER / REMOVE) -->
+                    <!-- CONTROLS -->
                     <div id="item-controls" class="mt-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs opacity-50 pointer-events-none transition">
-                        <div class="flex items-center gap-3">
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-medium text-slate-500">Tamanho:</span>
-                                <input type="range" id="control-scale" min="0.3" max="2.5" step="0.05" value="1" class="w-20 sm:w-28 accent-purple-600 cursor-pointer">
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <span class="font-medium text-slate-500">Rotação:</span>
-                                <input type="range" id="control-rotation" min="-180" max="180" step="5" value="0" class="w-20 sm:w-24 accent-purple-600 cursor-pointer">
-                            </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-medium text-slate-500">Tamanho:</span>
+                            <i class="fa-solid fa-minus text-slate-400"></i>
+                            <input type="range" id="control-scale" min="0.3" max="2.5" step="0.05" value="1" class="w-24 sm:w-32 accent-purple-600">
+                            <i class="fa-solid fa-plus text-slate-400"></i>
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <button id="btn-item-layer-up" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold" title="Avançar Camada">
+                        <div class="flex items-center gap-2">
+                            <button id="btn-item-layer-up" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Avançar Camada">
                                 <i class="fa-solid fa-layer-group"></i> +
                             </button>
-                            <button id="btn-item-layer-down" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold" title="Recuar Camada">
+                            <button id="btn-item-layer-down" class="p-2 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100" title="Recuar Camada">
                                 <i class="fa-solid fa-layer-group"></i> -
                             </button>
-                            <button id="btn-item-delete" class="p-2 rounded bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100 font-semibold flex items-center gap-1 cursor-pointer" title="Remover Peça">
-                                <i class="fa-solid fa-trash-can"></i>
+                            <button id="btn-item-delete" class="p-2 rounded bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 hover:bg-red-100 font-semibold flex items-center gap-1" title="Remover Peça">
+                                <i class="fa-solid fa-trash-can"></i> Remover Peça
                             </button>
                         </div>
                     </div>
 
                     <!-- SAVE LOOK BAR -->
                     <div class="mt-4 flex flex-col sm:flex-row gap-2">
-                        <input type="text" id="input-look-name" placeholder="Nome do Look (Ex: Look de Trabalho)" class="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <select id="select-look-occasion" class="px-3 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <input type="text" id="input-look-name" placeholder="Nome do Look (Ex: Look Trabalho)" class="flex-1 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <select id="select-look-occasion" class="px-3 py-2.5 rounded-xl text-xs sm:text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option value="Casual">Casual</option>
                             <option value="Trabalho">Trabalho</option>
                             <option value="Festa">Festa</option>
                             <option value="Esporte">Esporte</option>
                             <option value="Elegante">Elegante</option>
                         </select>
-                        <button id="btn-save-look" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-md shadow-purple-500/20 cursor-pointer">
+                        <button id="btn-save-look" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5 shadow-md shadow-purple-500/20">
                             <i class="fa-solid fa-bookmark"></i>
                             <span>Salvar Look</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: CLOSET & SAVED LOOKS TABS -->
+                <!-- RIGHT COLUMN: CLOSET -->
                 <div class="w-full lg:w-96 flex flex-col bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5">
                     
-                    <!-- TAB NAVIGATION -->
                     <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
-                        <button id="tab-btn-closet" class="flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2 cursor-pointer">
+                        <button id="tab-btn-closet" class="flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-shirt"></i> Guarda-Roupa
                         </button>
-                        <button id="tab-btn-looks" class="flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2 cursor-pointer">
+                        <button id="tab-btn-looks" class="flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-heart"></i> Looks Salvos (<span id="looks-count">0</span>)
                         </button>
                     </div>
 
-                    <!-- TAB 1: CLOSET CLOTHES MANAGEMENT -->
                     <div id="tab-content-closet" class="flex-1 flex flex-col gap-4">
-                        
-                        <!-- ADD CLOTHING ITEM NATIVE BUTTON WITH LABEL -->
+                        <!-- BOTÃO ADICIONAR PEÇA (USANDO ESTRUTURA NATIVA COM LABEL) -->
                         <div class="flex gap-2">
                             <input type="file" id="input-clothing-photo" accept="image/*" class="hidden">
-                            <label for="input-clothing-photo" class="w-full cursor-pointer py-3 px-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition flex items-center justify-center gap-2 text-xs font-semibold">
+                            <label for="input-clothing-photo" class="w-full cursor-pointer py-3 px-3 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 transition flex items-center justify-center gap-2 text-xs font-semibold">
                                 <i class="fa-solid fa-plus text-sm"></i>
-                                <span>Adicionar Nova Peça (Galeria/PC)</span>
+                                <span>Adicionar Nova Peça do Celular/PC</span>
                             </label>
                         </div>
 
-                        <!-- CATEGORIES FILTERS -->
                         <div class="flex items-center gap-1.5 overflow-x-auto pb-2 text-xs">
-                            <button class="category-btn active px-3 py-1.5 rounded-lg bg-purple-600 text-white font-medium whitespace-nowrap cursor-pointer" data-cat="all">Todas</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer" data-cat="Tops">Tops</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer" data-cat="Bottoms">Calças/Saias</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer" data-cat="Dresses">Vestidos</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer" data-cat="Shoes">Sapatos</button>
-                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200 dark:hover:bg-slate-600 cursor-pointer" data-cat="Accessories">Acessórios</button>
+                            <button class="category-btn active px-3 py-1.5 rounded-lg bg-purple-600 text-white font-medium whitespace-nowrap" data-cat="all">Todas</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Tops">Tops/Blusas</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Bottoms">Calças/Saias</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Dresses">Vestidos</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Shoes">Sapatos</button>
+                            <button class="category-btn px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium whitespace-nowrap hover:bg-slate-200" data-cat="Accessories">Acessórios</button>
                         </div>
 
-                        <!-- CLOTHES GRID GALLERY -->
                         <div id="clothes-grid" class="flex-1 min-h-[300px] max-h-[460px] overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-1">
-                            <!-- Dynamic Clothes Grid Content -->
                         </div>
                     </div>
 
-                    <!-- TAB 2: SAVED LOOKS GALLERY -->
                     <div id="tab-content-looks" class="flex-1 flex flex-col gap-4 hidden">
-                        <!-- Filter by Occasion -->
                         <div class="flex items-center gap-2">
                             <span class="text-xs text-slate-500 font-medium">Filtrar:</span>
-                            <select id="filter-occasion" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border-none focus:outline-none">
+                            <select id="filter-occasion" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-slate-100 dark:bg-slate-700 border-none focus:outline-none text-slate-700 dark:text-slate-200">
                                 <option value="all">Todas as Ocasiões</option>
                                 <option value="Casual">Casual</option>
                                 <option value="Trabalho">Trabalho</option>
@@ -341,9 +313,7 @@
                             </select>
                         </div>
 
-                        <!-- SAVED LOOKS LIST -->
                         <div id="looks-list" class="flex-1 min-h-[300px] max-h-[460px] overflow-y-auto flex flex-col gap-3">
-                            <!-- Dynamic Saved Looks Content -->
                         </div>
                     </div>
 
@@ -361,7 +331,7 @@
                 <h3 class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
                     <i class="fa-solid fa-palette text-purple-600"></i> Personalizar Aparência
                 </h3>
-                <button id="btn-close-theme" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">
+                <button id="btn-close-theme" class="text-slate-400 hover:text-slate-600 text-lg">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -370,10 +340,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Modo Escuro / Claro</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="setDarkMode(false)" class="p-3 rounded-xl border border-slate-200 flex items-center justify-center gap-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 cursor-pointer">
+                        <button onclick="setDarkMode(false)" class="p-3 rounded-xl border border-slate-200 flex items-center justify-center gap-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
                             <i class="fa-solid fa-sun text-amber-500"></i> Claro
                         </button>
-                        <button onclick="setDarkMode(true)" class="p-3 rounded-xl border border-slate-700 bg-slate-900 flex items-center justify-center gap-2 text-xs font-semibold text-white hover:bg-slate-800 cursor-pointer">
+                        <button onclick="setDarkMode(true)" class="p-3 rounded-xl border border-slate-700 bg-slate-900 flex items-center justify-center gap-2 text-xs font-semibold text-white hover:bg-slate-800">
                             <i class="fa-solid fa-moon text-purple-400"></i> Escuro
                         </button>
                     </div>
@@ -382,11 +352,11 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Cor Principal</label>
                     <div class="flex items-center gap-3">
-                        <button onclick="setPrimaryColor('#8b5cf6', '#7c3aed')" class="w-8 h-8 rounded-full bg-purple-600 ring-2 ring-offset-2 ring-purple-500 cursor-pointer"></button>
-                        <button onclick="setPrimaryColor('#ec4899', '#db2777')" class="w-8 h-8 rounded-full bg-pink-500 hover:scale-105 transition cursor-pointer"></button>
-                        <button onclick="setPrimaryColor('#3b82f6', '#2563eb')" class="w-8 h-8 rounded-full bg-blue-500 hover:scale-105 transition cursor-pointer"></button>
-                        <button onclick="setPrimaryColor('#10b981', '#059669')" class="w-8 h-8 rounded-full bg-emerald-500 hover:scale-105 transition cursor-pointer"></button>
-                        <button onclick="setPrimaryColor('#f59e0b', '#d97706')" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-105 transition cursor-pointer"></button>
+                        <button onclick="setPrimaryColor('#8b5cf6', '#7c3aed')" class="w-8 h-8 rounded-full bg-purple-600 ring-2 ring-offset-2 ring-purple-500"></button>
+                        <button onclick="setPrimaryColor('#ec4899', '#db2777')" class="w-8 h-8 rounded-full bg-pink-500 hover:scale-105 transition"></button>
+                        <button onclick="setPrimaryColor('#3b82f6', '#2563eb')" class="w-8 h-8 rounded-full bg-blue-500 hover:scale-105 transition"></button>
+                        <button onclick="setPrimaryColor('#10b981', '#059669')" class="w-8 h-8 rounded-full bg-emerald-500 hover:scale-105 transition"></button>
+                        <button onclick="setPrimaryColor('#f59e0b', '#d97706')" class="w-8 h-8 rounded-full bg-amber-500 hover:scale-105 transition"></button>
                     </div>
                 </div>
             </div>
@@ -415,7 +385,6 @@
         const doorsCenterBtn = document.getElementById('doors-center-btn');
         const btnToggleWardrobe = document.getElementById('btn-toggle-wardrobe');
         
-        const fittingStage = document.getElementById('fitting-stage');
         const clothesGrid = document.getElementById('clothes-grid');
         const overlayContainer = document.getElementById('clothing-overlay-container');
         const personImg = document.getElementById('person-img');
@@ -426,7 +395,6 @@
         
         const itemControls = document.getElementById('item-controls');
         const controlScale = document.getElementById('control-scale');
-        const controlRotation = document.getElementById('control-rotation');
         const btnItemLayerUp = document.getElementById('btn-item-layer-up');
         const btnItemLayerDown = document.getElementById('btn-item-layer-down');
         const btnItemDelete = document.getElementById('btn-item-delete');
@@ -448,44 +416,23 @@
         const btnCloseTheme = document.getElementById('btn-close-theme');
         const modalTheme = document.getElementById('modal-theme');
 
-        // --- STREAMING_CHUNK:Native Uploads and Drag & Drop Handlers... ---
-        // Native File Input Listener for Person Photo
+        // --- EVENTOS DE UPLOAD NATIVOS ---
+        
+        // 1. Receber foto de corpo inteiro (Avatar)
         inputPersonPhoto.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                loadPersonImageFile(file);
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    personImg.src = event.target.result;
+                    personImg.classList.remove('hidden');
+                    personPlaceholder.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
             }
         });
 
-        function loadPersonImageFile(file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                personImg.src = event.target.result;
-                personImg.classList.remove('hidden');
-                personPlaceholder.classList.add('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Drag and Drop functionality for Fitting Stage
-        fittingStage.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fittingStage.classList.add('drag-over');
-        });
-
-        fittingStage.addEventListener('dragleave', () => {
-            fittingStage.classList.remove('drag-over');
-        });
-
-        fittingStage.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fittingStage.classList.remove('drag-over');
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                loadPersonImageFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        // Add Clothing Item via Native Input
+        // 2. Receber nova peça de roupa
         inputClothingPhoto.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -524,7 +471,7 @@
 
         btnToggleWardrobe.addEventListener('click', toggleWardrobeDoors);
 
-        // --- STREAMING_CHUNK:Rendering Closet Gallery and Filters... ---
+        // --- CLOSET GALLERY RENDERING ---
         function renderClothesGrid() {
             clothesGrid.innerHTML = '';
             const filtered = activeCategory === 'all' 
@@ -564,7 +511,7 @@
             });
         });
 
-        // --- STREAMING_CHUNK:Interactive Stage Overlay & Drag Logic... ---
+        // --- STAGE OVERLAY & DRAG SYSTEM ---
         function addClothingToStage(item) {
             const instanceId = 'item-' + Date.now();
             const newItem = {
@@ -574,7 +521,6 @@
                 x: 80,
                 y: 80,
                 scale: 1,
-                rotation: 0,
                 zIndex: activeStageItems.length + 1
             };
 
@@ -589,10 +535,10 @@
                 const el = document.createElement('img');
                 el.src = item.image;
                 el.id = item.instanceId;
-                el.className = `clothing-overlay ${selectedOverlayId === item.instanceId ? 'active-item' : ''}`;
+                el.className = `clothing-overlay ${selectedOverlayId === item.instanceId ? 'active' : ''}`;
                 el.style.left = item.x + 'px';
                 el.style.top = item.y + 'px';
-                el.style.transform = `scale(${item.scale}) rotate(${item.rotation}deg)`;
+                el.style.transform = `scale(${item.scale})`;
                 el.style.zIndex = item.zIndex;
                 el.style.width = '160px';
 
@@ -655,14 +601,6 @@
             }
         });
 
-        controlRotation.addEventListener('input', (e) => {
-            const active = activeStageItems.find(i => i.instanceId === selectedOverlayId);
-            if (active) {
-                active.rotation = parseInt(e.target.value);
-                renderStageOverlays();
-            }
-        });
-
         btnItemLayerUp.addEventListener('click', () => {
             const active = activeStageItems.find(i => i.instanceId === selectedOverlayId);
             if (active) {
@@ -696,13 +634,12 @@
                 itemControls.classList.remove('opacity-50', 'pointer-events-none');
                 const active = activeStageItems.find(i => i.instanceId === selectedOverlayId);
                 controlScale.value = active.scale;
-                controlRotation.value = active.rotation || 0;
             } else {
                 itemControls.classList.add('opacity-50', 'pointer-events-none');
             }
         }
 
-        // --- STREAMING_CHUNK:Saved Looks Management... ---
+        // --- SAVED LOOKS ---
         btnSaveLook.addEventListener('click', () => {
             const name = inputLookName.value.trim() || 'Look sem Nome';
             const occasion = selectLookOccasion.value;
@@ -750,10 +687,10 @@
                         <p class="text-[10px] text-slate-400 mt-1">${look.items.length} peças</p>
                     </div>
                     <div class="flex items-center gap-1">
-                        <button onclick="loadLook(${look.id})" class="p-2 rounded-lg bg-purple-600 text-white text-xs hover:bg-purple-700 cursor-pointer" title="Usar Look no Manequim">
+                        <button onclick="loadLook(${look.id})" class="p-2 rounded-lg bg-purple-600 text-white text-xs hover:bg-purple-700" title="Usar Look">
                             <i class="fa-solid fa-shirt"></i>
                         </button>
-                        <button onclick="deleteLook(${look.id})" class="p-2 rounded-lg bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-300 text-xs hover:bg-red-100 cursor-pointer" title="Excluir">
+                        <button onclick="deleteLook(${look.id})" class="p-2 rounded-lg bg-red-50 text-red-600 text-xs hover:bg-red-100" title="Excluir">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -778,17 +715,17 @@
 
         filterOccasion.addEventListener('change', renderSavedLooks);
 
-        // --- TABS & THEMES ---
+        // --- TABS & MODALS ---
         tabBtnCloset.onclick = () => {
-            tabBtnCloset.className = "flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2 cursor-pointer";
-            tabBtnLooks.className = "flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2 cursor-pointer";
+            tabBtnCloset.className = "flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2";
+            tabBtnLooks.className = "flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2";
             tabContentCloset.classList.remove('hidden');
             tabContentLooks.classList.add('hidden');
         };
 
         tabBtnLooks.onclick = () => {
-            tabBtnLooks.className = "flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2 cursor-pointer";
-            tabBtnCloset.className = "flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2 cursor-pointer";
+            tabBtnLooks.className = "flex-1 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400 flex items-center justify-center gap-2";
+            tabBtnCloset.className = "flex-1 py-2.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 border-b-2 border-transparent hover:text-slate-700 flex items-center justify-center gap-2";
             tabContentLooks.classList.remove('hidden');
             tabContentCloset.classList.add('hidden');
         };
@@ -809,7 +746,7 @@
             document.documentElement.style.setProperty('--color-primary-hover', hover);
         }
 
-        // INITIALIZE APP
+        // INIT
         renderClothesGrid();
         renderSavedLooks();
     </script>
