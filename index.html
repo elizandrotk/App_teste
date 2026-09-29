@@ -86,16 +86,18 @@
 
         .controls-toolbar {
             position: absolute;
-            top: -40px;
+            top: -50px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 4px;
-            background: rgba(15, 23, 42, 0.85);
-            padding: 4px 8px;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 6px 12px;
             border-radius: 20px;
             z-index: 50;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
         }
 
         .controls-toolbar button {
@@ -112,6 +114,12 @@
 
         .controls-toolbar button:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+
+        .size-slider {
+            width: 80px;
+            accent-color: var(--btn-primary);
+            cursor: pointer;
         }
 
         .clothing-card {
@@ -158,7 +166,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
-                <p class="text-sm text-slate-500">Guarda-Roupa, Ajustes de Peça e Salvar Imagem</p>
+                <p class="text-sm text-slate-500">Ajuste de Tamanho de Roupas, Redimensionador & Fotos</p>
             </div>
         </div>
         
@@ -190,7 +198,7 @@
                         <i class="fa-solid fa-door-closed"></i>
                     </div>
                     <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
-                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Experimente combinações, ajuste o tamanho das peças na tela e baixe o resultado final.</p>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Ajuste perfeitamente o tamanho de cada peça sobre a sua foto utilizando a barra de tamanho.</p>
                     <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
                         <i class="fa-solid fa-door-open"></i>
                         Abrir Guarda-Roupa
@@ -211,10 +219,10 @@
                         <div class="flex gap-2 flex-wrap">
                             <input type="file" id="person-upload" accept="image/*" class="hidden">
                             <button onclick="document.getElementById('person-upload').click()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-2 transition">
-                                <i class="fa-solid fa-camera"></i> Alterar Foto
+                                <i class="fa-solid fa-camera"></i> Carregar Foto do Avatar
                             </button>
                             <button id="btn-download-image" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-sm">
-                                <i class="fa-solid fa-download"></i> Baixar Imagem do Look
+                                <i class="fa-solid fa-download"></i> Baixar Imagem
                             </button>
                             <button id="btn-clear-canvas" class="px-3 py-2 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-semibold text-red-600 flex items-center gap-2 transition">
                                 <i class="fa-solid fa-trash-can"></i> Limpar
@@ -226,8 +234,8 @@
                     <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center bg-slate-50">
                         <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
                             <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
-                            <p class="font-semibold">Carregue uma foto de corpo inteiro ou escolha uma peça de teste</p>
-                            <p class="text-xs max-w-xs">Clique na peça no palco para abrir os botões de ajuste de tamanho e rotação.</p>
+                            <p class="font-semibold">Carregue a sua foto e clique nas roupas para testar</p>
+                            <p class="text-xs max-w-xs">Ao clicar na roupa no corpo, use a barra deslizante para aumentar ou diminuir o tamanho da peça.</p>
                         </div>
 
                         <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
@@ -261,7 +269,7 @@
                                 <option value="season">Estação</option>
                                 <option value="event">Evento</option>
                             </select>
-                            <input type="text" id="new-category-name" placeholder="Ex: Balada, Balé..." class="flex-1 text-xs p-2 border rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-400">
+                            <input type="text" id="new-category-name" placeholder="Ex: Balada, Praia..." class="flex-1 text-xs p-2 border rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-purple-400">
                         </div>
                         <button id="btn-add-category" class="bg-slate-800 hover:bg-slate-900 text-white w-full py-2 rounded-lg text-xs font-bold transition">
                             Adicionar Categoria
@@ -271,7 +279,7 @@
                     <!-- ADICIONAR PEÇA DE ROUPA -->
                     <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col gap-3 shadow-sm">
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-shirt text-purple-600"></i> Adicionar Peça Própria
+                            <i class="fa-solid fa-shirt text-purple-600"></i> Cadastrar Nova Roupa
                         </span>
                         
                         <div class="grid grid-cols-2 gap-2">
@@ -299,7 +307,7 @@
 
                         <input type="file" id="clothing-upload" accept="image/*" class="hidden">
                         <button onclick="document.getElementById('clothing-upload').click()" class="btn-main w-full py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow shadow-purple-500/20">
-                            <i class="fa-solid fa-plus"></i> Enviar Imagem de Roupa
+                            <i class="fa-solid fa-plus"></i> Enviar Foto da Peça
                         </button>
                     </div>
 
@@ -317,13 +325,13 @@
                     </div>
 
                     <div id="clothing-list" class="grid grid-cols-2 gap-3 overflow-y-auto pr-1 max-h-[220px]">
-                        <!-- Peças serão renderizadas via JavaScript -->
+                        <!-- Peças renderizadas via JS -->
                     </div>
 
                     <!-- PERFIS DE LOOKS SALVOS -->
                     <div class="pt-3 border-t border-slate-200 flex flex-col gap-2">
                         <span class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="fa-solid fa-layer-group text-purple-600"></i> Looks Salvos
+                            <i class="fa-solid fa-layer-group text-purple-600"></i> Perfis Salvos
                         </span>
                         <div id="saved-profiles-list" class="flex flex-col gap-2 overflow-y-auto max-h-[160px]">
                             <p class="text-xs text-slate-400 text-center py-2">Nenhum look salvo ainda.</p>
@@ -338,33 +346,27 @@
     </main>
 
     <footer class="mt-8 pt-4 border-t border-slate-200 text-center text-slate-500 text-xs">
-        Provador Virtual v4.0 | Ajustes Dinâmicos & Download do Look
+        Provador Virtual v5.0 | Redimensionador Dinâmico e Controle de Escala
     </footer>
 
     <!-- JAVASCRIPT -->
     <script>
-        // --- 1. PEÇAS PRÉ-CARREGADAS PARA TESTES (DEMO) ---
+        // --- 1. PEÇAS DEMO ---
         const demoClothes = [
             {
                 id: 1,
-                src: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png', // Fallback visual limpo
-                season: 'Verão ☀️',
-                event: 'Casual'
-            },
-            {
-                id: 2,
                 src: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Blue_T-shirt.png',
                 season: 'Verão ☀️',
                 event: 'Casual'
             },
             {
-                id: 3,
+                id: 2,
                 src: 'https://upload.wikimedia.org/wikipedia/commons/d/d2/Jeans_for_men.png',
                 season: 'Outono 🍂',
                 event: 'Casual'
             },
             {
-                id: 4,
+                id: 3,
                 src: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Black_Jacket.png',
                 season: 'Inverno ❄',
                 event: 'Trabalho'
@@ -535,7 +537,7 @@
                 const thumb = document.createElement('img');
                 thumb.src = item.src;
                 thumb.className = 'clothing-thumb';
-                thumb.title = 'Clique para experimentar';
+                thumb.title = 'Clique para adicionar ao avatar';
                 thumb.addEventListener('click', () => addClothingToStage(item.src));
 
                 const tagsDiv = document.createElement('div');
@@ -555,8 +557,8 @@
         filterEvent.addEventListener('change', renderClothesList);
         renderClothesList();
 
-        // --- 7. ADICIONAR PEÇA AO PALCO COM CONTROLES (AUMENTAR/DIMINUIR/GIRAR/REMOVER) ---
-        function addClothingToStage(src, top = '150px', left = '150px', width = 140, rotation = 0) {
+        // --- 7. ADICIONAR E REDIMENSIONAR PEÇA NO AVATAR ---
+        function addClothingToStage(src, top = '150px', left = '150px', width = 100, rotation = 0) {
             const wrapper = document.createElement('div');
             wrapper.className = 'clothing-wrapper';
             wrapper.style.top = top;
@@ -568,31 +570,55 @@
             img.src = src;
             img.style.transform = `rotate(${rotation}deg)`;
 
-            // Barra de Controles da Peça
+            // Barra de Ferramentas / Redimensionador
             const toolbar = document.createElement('div');
             toolbar.className = 'controls-toolbar hidden';
 
-            const btnZoomIn = document.createElement('button');
-            btnZoomIn.innerHTML = '<i class="fa-solid fa-plus"></i>';
-            btnZoomIn.title = 'Aumentar Tamanho';
-            btnZoomIn.addEventListener('click', (e) => {
+            // Slider para Ajuste de Tamanho Preciso
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = '20';
+            slider.max = '400';
+            slider.value = width;
+            slider.className = 'size-slider';
+            slider.title = 'Ajuste Fino do Tamanho';
+
+            slider.addEventListener('input', (e) => {
                 e.stopPropagation();
-                let currentWidth = parseInt(wrapper.style.width);
-                wrapper.style.width = (currentWidth + 15) + 'px';
+                const newWidth = e.target.value;
+                wrapper.style.width = newWidth + 'px';
             });
 
+            // Botão Zoom Out (-)
             const btnZoomOut = document.createElement('button');
             btnZoomOut.innerHTML = '<i class="fa-solid fa-minus"></i>';
-            btnZoomOut.title = 'Diminuir Tamanho';
+            btnZoomOut.title = 'Diminuir Pequeno';
             btnZoomOut.addEventListener('click', (e) => {
                 e.stopPropagation();
                 let currentWidth = parseInt(wrapper.style.width);
-                if (currentWidth > 40) wrapper.style.width = (currentWidth - 15) + 'px';
+                if (currentWidth > 30) {
+                    const updated = currentWidth - 10;
+                    wrapper.style.width = updated + 'px';
+                    slider.value = updated;
+                }
             });
 
+            // Botão Zoom In (+)
+            const btnZoomIn = document.createElement('button');
+            btnZoomIn.innerHTML = '<i class="fa-solid fa-plus"></i>';
+            btnZoomIn.title = 'Aumentar Pequeno';
+            btnZoomIn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let currentWidth = parseInt(wrapper.style.width);
+                const updated = currentWidth + 10;
+                wrapper.style.width = updated + 'px';
+                slider.value = updated;
+            });
+
+            // Botão Girar
             const btnRotate = document.createElement('button');
             btnRotate.innerHTML = '<i class="fa-solid fa-rotate-right"></i>';
-            btnRotate.title = 'Girar';
+            btnRotate.title = 'Girar Peça';
             btnRotate.addEventListener('click', (e) => {
                 e.stopPropagation();
                 let r = (parseInt(wrapper.dataset.rotation) + 15) % 360;
@@ -600,6 +626,7 @@
                 img.style.transform = `rotate(${r}deg)`;
             });
 
+            // Botão Remover
             const btnDelete = document.createElement('button');
             btnDelete.innerHTML = '<i class="fa-solid fa-trash"></i>';
             btnDelete.className = 'hover:bg-red-600/50';
@@ -609,19 +636,21 @@
                 wrapper.remove();
             });
 
-            toolbar.appendChild(btnZoomIn);
             toolbar.appendChild(btnZoomOut);
+            toolbar.appendChild(slider);
+            toolbar.appendChild(btnZoomIn);
             toolbar.appendChild(btnRotate);
             toolbar.appendChild(btnDelete);
 
             wrapper.appendChild(toolbar);
             wrapper.appendChild(img);
 
-            // Seleção da peça para exibir controles
+            // Ao clicar na peça, abre a barra de controles e atualiza o slider com a largura atual
             wrapper.addEventListener('click', (e) => {
                 e.stopPropagation();
                 deselectAll();
                 wrapper.classList.add('selected');
+                slider.value = parseInt(wrapper.style.width);
                 toolbar.classList.remove('hidden');
                 bringToFront(wrapper);
             });
@@ -630,7 +659,6 @@
             overlayContainer.appendChild(wrapper);
         }
 
-        // Deselecionar peças ao clicar fora
         document.getElementById('stage-canvas').addEventListener('click', () => {
             deselectAll();
         });
@@ -710,11 +738,11 @@
             }
         }
 
-        // --- 8. SALVAR IMAGEM / BAIXAR LOOK ---
+        // --- 8. BAIXAR LOOK ---
         const btnDownloadImage = document.getElementById('btn-download-image');
 
         btnDownloadImage.addEventListener('click', () => {
-            deselectAll(); // Esconde barras de ferramentas antes da captura
+            deselectAll();
 
             const stage = document.getElementById('stage-canvas');
 
@@ -728,7 +756,7 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             }).catch(err => {
-                alert('Ocorreu um erro ao gerar a imagem. Verifique se as imagens possuem permissão de exibição.');
+                alert('Erro ao gerar imagem.');
             });
         });
 
@@ -743,12 +771,12 @@
             const activeItems = overlayContainer.querySelectorAll('.clothing-wrapper');
 
             if (!name) {
-                alert('Por favor, digite um nome para o perfil.');
+                alert('Digite um nome para o perfil.');
                 return;
             }
 
             if (activeItems.length === 0) {
-                alert('Adicione pelo menos uma peça de roupa no provador!');
+                alert('Adicione roupas no provador antes de salvar.');
                 return;
             }
 
