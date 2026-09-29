@@ -4,234 +4,233 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Provador Virtual & Guarda-Roupa Digital</title>
-    <!-- Tailwind CSS CDN -->
+    
+    <!-- Tailwind CSS CDN para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    
+    <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- ESTILOS CUSTOMIZADOS (CSS) --- */
+        
+        :root {
+            /* Variáveis de cor controladas pelo JavaScript */
+            --bg-primary: #f4f1ea;
+            --btn-primary: #8b5cf6;
+            --btn-primary-hover: #7c3aed;
+            --text-color: #1e293b;
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
         }
 
-        .clothing-item {
+        /* Botão principal customizado */
+        .btn-main {
+            background-color: var(--btn-primary);
+            color: white;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn-main:hover {
+            background-color: var(--btn-primary-hover);
+        }
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        /* Estilo para inputs de cor */
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+        }
+
+        /* Painel do provador (palco) */
+        #stage-canvas {
+            border: 2px dashed #cbd5e1;
+            background-color: #ffffff;
+            /* Garante que o usuário possa clicar e arrastar */
+            touch-action: none; 
+        }
+
+        /* Peças de roupa sobrepostas no corpo */
+        .overlay-item {
             position: absolute;
-            cursor: move;
-            touch-action: none;
-            user-select: none;
+            cursor: move; /* Cursor de "mudar de posição" */
+            user-select: none; /* Impede seleção de texto acidental ao arrastar */
+            /* Transição suave apenas para quando a peça é solta, para não lagar o drag */
+            transition: box-shadow 0.2s ease; 
         }
 
-        .clothing-item.selected {
-            outline: 2px dashed #8b5cf6;
-            outline-offset: 4px;
+        /* Destaque quando a peça está sendo arrastada */
+        .overlay-item.dragging {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            opacity: 0.9;
         }
 
-        /* Animação das portas */
-        .door-left {
-            transform-origin: left center;
-            transition: transform 0.6s ease-in-out;
-        }
-        .door-right {
-            transform-origin: right center;
-            transition: transform 0.6s ease-in-out;
-        }
-        .doors-open .door-left {
-            transform: rotateY(-110deg);
-        }
-        .doors-open .door-right {
-            transform: rotateY(110deg);
+        /* Miniaturas na lista de roupas */
+        .clothing-thumb {
+            width: 100%;
+            height: 80px;
+            object-fit: contain; /* Garante que a roupa inteira apareça sem cortar */
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: border-color 0.2s ease, transform 0.2s ease;
         }
 
-        .wood-bg {
-            background: radial-gradient(circle, #3e2415 0%, #201108 100%);
+        .clothing-thumb:hover {
+            border-color: var(--btn-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Esconder elementos */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col p-3 md:p-6">
 
-    <!-- HEADER -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-xl shadow-md">
-                    <i class="fa-solid fa-shirt"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">Provador Virtual</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Guarda-Roupa Interativo</p>
-                </div>
+    <!-- --- CABEÇALHO --- -->
+    <header class="flex items-center justify-between pb-6 border-b border-slate-200 mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-purple-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-purple-500/30">
+                <i class="fa-solid fa-shirt"></i>
             </div>
-
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Provador Virtual</h1>
+                <p class="text-sm text-slate-500">Guarda-Roupa Digital Interativo</p>
+            </div>
+        </div>
+        
+        <!-- PAINEL DE CORES (Personalização) -->
+        <div class="flex items-center gap-4 bg-white p-3 rounded-full shadow-inner border border-slate-100">
             <div class="flex items-center gap-2">
-                <button id="btn-toggle-doors" class="px-3.5 py-2 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 hover:bg-purple-200 text-xs sm:text-sm font-semibold transition flex items-center gap-2">
-                    <i class="fa-solid fa-door-open"></i>
-                    <span id="txt-toggle-doors">Abrir Roupeiro</span>
-                </button>
+                <label for="bg-color" class="text-xs font-semibold text-slate-500">Fundo:</label>
+                <input type="color" id="bg-color" value="#f4f1ea">
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="btn-color" class="text-xs font-semibold text-slate-500">Botões:</label>
+                <input type="color" id="btn-color" value="#8b5cf6">
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col gap-6">
-
-        <!-- WARDROBE CABINET STAGE -->
-        <div id="cabinet-stage" class="relative w-full rounded-3xl overflow-hidden bg-slate-950 shadow-2xl min-h-[600px] flex flex-col justify-center perspective-[1000px]">
+    <!-- --- CONTEÚDO PRINCIPAL --- -->
+    <main class="flex-1 max-w-7xl w-full mx-auto">
+        
+        <!-- SEÇÃO DO ROUPEIRO (Guarda-Roupa) -->
+        <div id="wardrobe-container" class="relative bg-white p-6 rounded-3xl shadow-xl border border-slate-100 min-h-[500px]">
             
-            <!-- PORTAS DO ROUPEIRO (LAYER SUPERIOR) -->
-            <div id="doors-layer" class="absolute inset-0 z-30 flex w-full h-full pointer-events-auto">
-                <div class="door-left w-1/2 h-full wood-bg border-r-2 border-amber-950/50 flex items-center justify-end pr-6 shadow-2xl">
-                    <div class="w-4 h-28 bg-amber-300 rounded-full shadow-lg border border-amber-500 cursor-pointer" onclick="toggleDoors()"></div>
-                </div>
-                <div class="door-right w-1/2 h-full wood-bg border-l-2 border-amber-950/50 flex items-center justify-start pl-6 shadow-2xl">
-                    <div class="w-4 h-28 bg-amber-300 rounded-full shadow-lg border border-amber-500 cursor-pointer" onclick="toggleDoors()"></div>
-                </div>
-
-                <div id="doors-banner" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-xs z-40">
-                    <div class="bg-slate-900/90 border border-slate-700 p-6 rounded-2xl text-center max-w-xs shadow-2xl">
-                        <div class="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-white text-2xl shadow-lg">
-                            <i class="fa-solid fa-door-closed"></i>
-                        </div>
-                        <h2 class="text-xl font-bold text-white mb-1">Seu Roupeiro está Fechado</h2>
-                        <p class="text-xs text-slate-400 mb-4">Clique no botão para abrir as portas e começar a provar as roupas.</p>
-                        <button onclick="toggleDoors()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold text-xs transition">
-                            Abrir Roupeiro
-                        </button>
+            <!-- PORTAS DO GUARDA-ROUPA (Layer Superior) -->
+            <div id="doors-layer" class="absolute inset-0 bg-slate-900 rounded-3xl flex flex-col items-center justify-center z-20 transition-opacity duration-500">
+                <!-- Visual de madeira simples -->
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/wood-pattern-3.png')] opacity-30 rounded-3xl"></div>
+                
+                <div class="relative z-10 text-center p-8">
+                    <div class="w-20 h-20 rounded-full bg-amber-400 text-amber-950 flex items-center justify-center text-4xl mx-auto mb-6 shadow-xl border-4 border-amber-500">
+                        <i class="fa-solid fa-door-closed"></i>
                     </div>
+                    <h2 class="text-3xl font-extrabold text-white mb-3 tracking-tight">Seu Roupeiro Digital</h2>
+                    <p class="text-amber-100 mb-8 max-w-md mx-auto">Abra as portas para visualizar suas roupas, criar combinações e experimentar looks no provador virtual.</p>
+                    <button id="open-btn" class="btn-main px-8 py-4 rounded-full text-lg font-bold flex items-center gap-3 mx-auto shadow-lg shadow-purple-500/30">
+                        <i class="fa-solid fa-door-open"></i>
+                        Abrir Guarda-Roupa
+                    </button>
                 </div>
             </div>
 
-            <!-- INTERIOR DO ROUPEIRO -->
-            <div id="cabinet-interior" class="relative z-10 w-full h-full bg-slate-100 dark:bg-slate-900 p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
+            <!-- CONTEÚDO INTERNO (Aparece após abrir) -->
+            <div id="wardrobe-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- ÁREA DO PROVADOR (ESQUERDA) -->
-                <div class="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col shadow-sm">
-                    
-                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 dark:border-slate-700">
-                        <span class="font-bold text-sm flex items-center gap-2">
-                            <i class="fa-solid fa-user text-purple-600"></i> Provador
-                        </span>
-
-                        <div class="flex items-center gap-2">
-                            <!-- BOTAO ENVIAR FOTO DO CORPO -->
-                            <div class="relative">
-                                <input type="file" id="input-avatar" accept="image/*" class="hidden">
-                                <button id="btn-trigger-avatar" class="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 border border-purple-200 dark:border-purple-800 rounded-lg text-xs font-semibold hover:bg-purple-100 transition flex items-center gap-1.5">
-                                    <i class="fa-solid fa-camera"></i>
-                                    <span>Sua Foto</span>
-                                </button>
-                            </div>
-
-                            <button id="btn-clear-canvas" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-semibold hover:bg-slate-200 transition">
+                <!-- COLUNA ESQUERDA: PROVADOR (Palco) -->
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800">
+                            <i class="fa-solid fa-user-check text-purple-600"></i>
+                            Provador Virtual
+                        </h3>
+                        <div class="flex gap-2">
+                            <!-- Input Escondido para Upload do Avatar -->
+                            <input type="file" id="person-upload" accept="image/*" class="hidden">
+                            <button onclick="document.getElementById('person-upload').click()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-semibold text-slate-700 flex items-center gap-2 transition">
+                                <i class="fa-solid fa-camera"></i>
+                                Alterar Foto
+                            </button>
+                            <button id="btn-clear-canvas" class="px-4 py-2 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-semibold text-red-600 flex items-center gap-2 transition">
+                                <i class="fa-solid fa-trash-can"></i>
                                 Limpar
                             </button>
                         </div>
                     </div>
 
-                    <!-- PALCO DO PROVADOR -->
-                    <div id="canvas-stage" class="relative flex-1 min-h-[420px] bg-slate-50 dark:bg-slate-950 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden flex items-center justify-center">
+                    <!-- PALCO / TELAS (Onde a mágica acontece) -->
+                    <div id="stage-canvas" class="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
                         
-                        <!-- Mensagem inicial do corpo -->
-                        <div id="placeholder-avatar" class="text-center p-6 flex flex-col items-center">
-                            <div class="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3">
-                                <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
-                            </div>
-                            <p class="font-bold text-sm mb-1">Carregue sua foto de corpo inteiro</p>
-                            <p class="text-xs text-slate-400 mb-4 max-w-xs">Envie uma foto para provar as roupas diretamente no seu corpo.</p>
-                            <button onclick="document.getElementById('input-avatar').click()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-semibold transition">
-                                Selecionar Imagem
-                            </button>
+                        <!-- Mensagem inicial (Placeholder) -->
+                        <div id="placeholder-text" class="text-center p-8 flex flex-col items-center gap-4 text-slate-400">
+                            <i class="fa-solid fa-cloud-arrow-up text-6xl"></i>
+                            <p class="font-semibold">Carregue uma foto de corpo inteiro para começar</p>
+                            <p class="text-xs max-w-xs">Para melhores resultados, use uma foto com fundo neutro e boa iluminação.</p>
                         </div>
 
-                        <!-- Imagem do Corpo Base -->
-                        <img id="avatar-img" class="absolute inset-0 w-full h-full object-contain pointer-events-none hidden" alt="Seu Corpo">
+                        <!-- Imagem do Corpo Base (Avatar) -->
+                        <img id="person-img" class="hidden max-h-full max-w-full object-contain z-0" alt="Avatar">
 
-                        <!-- Container para Peças sobrepostas -->
-                        <div id="overlay-container" class="absolute inset-0 pointer-events-auto"></div>
-                    </div>
-
-                    <!-- BARRA DE AJUSTES DA PEÇA SELECIONADA -->
-                    <div id="controls-bar" class="mt-3 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs opacity-50 pointer-events-none transition">
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold text-slate-500">Tamanho:</span>
-                            <input type="range" id="range-scale" min="0.3" max="2.5" step="0.05" value="1" class="w-28 accent-purple-600">
-                        </div>
-
-                        <div class="flex items-center gap-2">
-                            <span class="font-semibold text-slate-500">Rotação:</span>
-                            <input type="range" id="range-rotate" min="-180" max="180" step="5" value="0" class="w-24 accent-purple-600">
-                        </div>
-
-                        <div class="flex items-center gap-1">
-                            <button id="btn-layer-up" class="p-1.5 px-2 bg-white dark:bg-slate-800 border rounded hover:bg-slate-100" title="Para Frente">
-                                <i class="fa-solid fa-arrow-up"></i>
-                            </button>
-                            <button id="btn-layer-down" class="p-1.5 px-2 bg-white dark:bg-slate-800 border rounded hover:bg-slate-100" title="Para Trás">
-                                <i class="fa-solid fa-arrow-down"></i>
-                            </button>
-                            <button id="btn-delete-item" class="p-1.5 px-2 bg-red-50 text-red-600 border border-red-200 rounded font-semibold hover:bg-red-100" title="Remover">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                        <!-- CONTAINER PARA PEÇAS SOBREPOSTAS -->
+                        <div id="overlay-container" class="absolute inset-0 z-10 pointer-events-auto">
+                            <!-- As roupas adicionadas aparecerão aqui via JavaScript -->
                         </div>
                     </div>
-
-                    <!-- SALVAR LOOK -->
-                    <div class="mt-3 flex gap-2">
-                        <input type="text" id="input-look-title" placeholder="Nome do Look (Ex: Look Festa)" class="flex-1 px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:outline-none">
-                        <button id="btn-save-look" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs rounded-xl transition flex items-center gap-1">
-                            <i class="fa-solid fa-floppy-disk"></i> Salvar Look
-                        </button>
-                    </div>
-
                 </div>
 
-                <!-- ÁREA DE CLOSET / LOOKS (DIREITA) -->
-                <div class="w-full lg:w-80 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 flex flex-col shadow-sm">
+                <!-- COLUNA DIREITA: CLOSET (Lista de Roupas) -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex flex-col gap-4">
+                    <h3 class="text-xl font-bold flex items-center gap-2 text-slate-800">
+                        <i class="fa-solid fa-box-archive text-purple-600"></i>
+                        Seu Closet
+                    </h3>
                     
-                    <!-- ABAS -->
-                    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-3">
-                        <button id="tab-clothes" class="flex-1 py-2 text-xs font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400">
-                            Roupas
+                    <p class="text-sm text-slate-500 mb-2">Adicione novas peças ao seu closet e clique nelas para experimentá-las no provador.</p>
+
+                    <!-- Botão para Upload de Nova Roupa -->
+                    <div class="relative">
+                        <input type="file" id="clothing-upload" accept="image/*" class="hidden">
+                        <button onclick="document.getElementById('clothing-upload').click()" class="btn-main w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow shadow-purple-500/20">
+                            <i class="fa-solid fa-plus"></i>
+                            Adicionar Nova Peça
                         </button>
-                        <button id="tab-looks" class="flex-1 py-2 text-xs font-semibold text-slate-400 border-b-2 border-transparent">
-                            Looks Salvos
-                        </button>
                     </div>
 
-                    <!-- CONTEÚDO DA ABA ROUPAS -->
-                    <div id="content-clothes" class="flex-1 flex flex-col gap-3">
-                        
-                        <!-- BOTAO DE ADICIONAR PEÇA DE ROUPA -->
-                        <div>
-                            <input type="file" id="input-clothing" accept="image/*" class="hidden">
-                            <button id="btn-trigger-clothing" class="w-full py-2.5 px-3 rounded-xl bg-purple-50 dark:bg-purple-900/30 border border-dashed border-purple-300 dark:border-purple-700 text-purple-600 dark:text-purple-300 hover:bg-purple-100 font-semibold text-xs transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Adicionar Peça do PC/Celular</span>
-                            </button>
-                        </div>
+                    <div class="border-t border-slate-200 my-2"></div>
 
-                        <!-- CATEGORIAS -->
-                        <div class="flex gap-1 overflow-x-auto pb-1 text-[11px]">
-                            <button class="btn-cat active px-2.5 py-1 rounded-lg bg-purple-600 text-white font-medium" data-cat="all">Todas</button>
-                            <button class="btn-cat px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium" data-cat="Tops">Blusas</button>
-                            <button class="btn-cat px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium" data-cat="Bottoms">Calças</button>
-                            <button class="btn-cat px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium" data-cat="Shoes">Calçados</button>
-                        </div>
-
-                        <!-- GRID DE PEÇAS DE ROUPA -->
-                        <div id="grid-clothes" class="flex-1 max-h-[380px] overflow-y-auto grid grid-cols-2 gap-2 pr-1">
-                            <!-- Inserido dinamicamente pelo JS -->
+                    <!-- LISTA DE ROUPAS (GRID) -->
+                    <div id="clothing-list" class="grid grid-cols-3 gap-3 overflow-y-auto pr-2 max-h-[400px]">
+                        <!-- Placeholders de exemplo -->
+                        <div class="text-center col-span-3 py-8 text-slate-400 flex flex-col items-center gap-3">
+                            <i class="fa-solid fa-tags text-4xl"></i>
+                            <p class="text-xs font-medium">Nenhuma peça adicionada ainda.</p>
                         </div>
                     </div>
-
-                    <!-- CONTEÚDO DA ABA LOOKS -->
-                    <div id="content-looks" class="flex-1 flex flex-col gap-3 hidden">
-                        <div id="list-looks" class="flex-1 max-h-[420px] overflow-y-auto flex flex-col gap-2">
-                            <!-- Inserido dinamicamente pelo JS -->
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
@@ -239,351 +238,228 @@
 
     </main>
 
-    <!-- JAVASCRIPT REESCRITO E TOTALMENTE CONECTADO -->
+    <!-- --- RODAPÉ --- -->
+    <footer class="mt-12 pt-6 border-t border-slate-200 text-center text-slate-500 text-xs">
+        Provador Virtual v1.0 | Desenvolvido para facilitar seu estilo digital.
+    </footer>
+
+    <!-- --- JAVASCRIPT (Lógica) --- -->
     <script>
-        // --- BASE DE DADOS DE ROUPAS ---
-        let clothingList = [
-            { id: 1, name: 'Camiseta Branca', category: 'Tops', image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=400&auto=format&fit=crop&q=60' },
-            { id: 2, name: 'Jaqueta Jeans', category: 'Tops', image: 'https://images.unsplash.com/photo-1544441893-675973e31985?w=400&auto=format&fit=crop&q=60' },
-            { id: 3, name: 'Calça Jeans', category: 'Bottoms', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&auto=format&fit=crop&q=60' },
-            { id: 4, name: 'Tênis', category: 'Shoes', image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&auto=format&fit=crop&q=60' }
-        ];
+        // --- 1. CONFIGURAÇÃO DE CORES (CSS Variables) ---
+        const bgColorInput = document.getElementById('bg-color');
+        const btnColorInput = document.getElementById('btn-color');
 
-        let canvasItems = [];
-        let savedLooks = [];
-        let selectedItemId = null;
-        let activeCategory = 'all';
-        let doorsOpen = false;
+        // Altera a cor de fundo do corpo
+        bgColorInput.addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--bg-primary', e.target.value);
+        });
 
-        // --- REFERÊNCIAS DO DOM ---
-        const inputAvatar = document.getElementById('input-avatar');
-        const btnTriggerAvatar = document.getElementById('btn-trigger-avatar');
-        const avatarImg = document.getElementById('avatar-img');
-        const placeholderAvatar = document.getElementById('placeholder-avatar');
+        // Altera a cor principal dos botões e destaques
+        btnColorInput.addEventListener('input', (e) => {
+            const newColor = e.target.value;
+            document.documentElement.style.setProperty('--btn-primary', newColor);
+            
+            // Gera automaticamente uma cor mais escura para o hover (simplificado)
+            // Para um app real, usaríamos uma função de manipulação de cor (ex: tinycolor)
+            document.documentElement.style.setProperty('--btn-primary-hover', newColor + 'dd'); 
+        });
 
-        const inputClothing = document.getElementById('input-clothing');
-        const btnTriggerClothing = document.getElementById('btn-trigger-clothing');
-        const gridClothes = document.getElementById('grid-clothes');
+
+        // --- 2. LÓGICA DE ABRIR O ROUPEIRO ---
+        const openBtn = document.getElementById('open-btn');
+        const doorsLayer = document.getElementById('doors-layer');
+        const wardrobeContent = document.getElementById('wardrobe-content');
+
+        openBtn.addEventListener('click', () => {
+            // Efeito de fade out na porta
+            doorsLayer.style.opacity = '0';
+            
+            // Espera a animação acabar para esconder de fato e mostrar o conteúdo
+            setTimeout(() => {
+                doorsLayer.classList.add('hidden');
+                wardrobeContent.classList.remove('hidden');
+            }, 500);
+        });
+
+
+        // --- 3. UPLOAD DA FOTO DE CORPO INTEIRO (AVATAR) ---
+        const personUpload = document.getElementById('person-upload');
+        const personImg = document.getElementById('person-img');
+        const placeholderText = document.getElementById('placeholder-text');
+
+        personUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    // Define a imagem carregada como fonte do avatar
+                    personImg.src = event.target.result;
+                    
+                    // Mostra a imagem e esconde o texto de ajuda
+                    personImg.classList.remove('hidden');
+                    placeholderText.classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
+        // --- 4. UPLOAD E GERENCIAMENTO DE ROUPAS ---
+        const clothingUpload = document.getElementById('clothing-upload');
+        const clothingList = document.getElementById('clothing-list');
         const overlayContainer = document.getElementById('overlay-container');
-
-        const controlsBar = document.getElementById('controls-bar');
-        const rangeScale = document.getElementById('range-scale');
-        const rangeRotate = document.getElementById('range-rotate');
-        const btnLayerUp = document.getElementById('btn-layer-up');
-        const btnLayerDown = document.getElementById('btn-layer-down');
-        const btnDeleteItem = document.getElementById('btn-delete-item');
         const btnClearCanvas = document.getElementById('btn-clear-canvas');
 
-        const inputLookTitle = document.getElementById('input-look-title');
-        const btnSaveLook = document.getElementById('btn-save-look');
-        const listLooks = document.getElementById('list-looks');
-
-        // --- CONEXÃO DOS BOTÕES DE UPLOAD VIA JS DIRECT CLICK ---
-        btnTriggerAvatar.addEventListener('click', () => {
-            inputAvatar.click();
-        });
-
-        btnTriggerClothing.addEventListener('click', () => {
-            inputClothing.click();
-        });
-
-        // 1. UPLOAD FOTO CORPO (AVATAR)
-        inputAvatar.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    avatarImg.src = event.target.result;
-                    avatarImg.classList.remove('hidden');
-                    placeholderAvatar.classList.add('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // 2. UPLOAD FOTO DE ROUPA
-        inputClothing.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const newItem = {
-                        id: Date.now(),
-                        name: 'Nova Peça',
-                        category: 'Tops',
-                        image: event.target.result
-                    };
-                    clothingList.unshift(newItem);
-                    renderClothesGrid();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // --- PORTAS DO ROUPEIRO ---
-        function toggleDoors() {
-            doorsOpen = !doorsOpen;
-            const cabinetStage = document.getElementById('cabinet-stage');
-            const doorsBanner = document.getElementById('doors-banner');
-            const txtToggleDoors = document.getElementById('txt-toggle-doors');
-
-            if (doorsOpen) {
-                cabinetStage.classList.add('doors-open');
-                doorsBanner.classList.add('hidden');
-                txtToggleDoors.textContent = 'Fechar Roupeiro';
-            } else {
-                cabinetStage.classList.remove('doors-open');
-                doorsBanner.classList.remove('hidden');
-                txtToggleDoors.textContent = 'Abrir Roupeiro';
-            }
-        }
-
-        document.getElementById('btn-toggle-doors').addEventListener('click', toggleDoors);
-
-        // --- RENDERIZAR GRID DE ROUPAS ---
-        function renderClothesGrid() {
-            gridClothes.innerHTML = '';
-            const filtered = activeCategory === 'all' 
-                ? clothingList 
-                : clothingList.filter(c => c.category === activeCategory);
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2 rounded-xl flex flex-col items-center cursor-pointer hover:border-purple-500 transition';
-                card.innerHTML = `
-                    <div class="w-full h-20 bg-white rounded-lg flex items-center justify-center overflow-hidden mb-1">
-                        <img src="${item.image}" class="h-full object-contain">
-                    </div>
-                    <span class="text-[10px] font-bold truncate w-full text-center">${item.name}</span>
-                `;
-                card.onclick = () => addItemToCanvas(item);
-                gridClothes.appendChild(card);
-            });
-        }
-
-        // --- CATEGORIAS ---
-        document.querySelectorAll('.btn-cat').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.btn-cat').forEach(b => {
-                    b.classList.remove('active', 'bg-purple-600', 'text-white');
-                    b.classList.add('bg-slate-100', 'dark:bg-slate-700', 'text-slate-600', 'dark:text-slate-300');
-                });
-                e.target.classList.add('active', 'bg-purple-600', 'text-white');
-                activeCategory = e.target.getAttribute('data-cat');
-                renderClothesGrid();
-            });
-        });
-
-        // --- PALCO E DRAG DE ROUPAS ---
-        function addItemToCanvas(item) {
-            const instanceId = 'item-' + Date.now();
-            const canvasItem = {
-                instanceId,
-                image: item.image,
-                x: 60,
-                y: 60,
-                scale: 1,
-                rotate: 0,
-                zIndex: canvasItems.length + 1
-            };
-
-            canvasItems.push(canvasItem);
-            renderCanvasItems();
-            selectCanvasItem(instanceId);
-        }
-
-        function renderCanvasItems() {
-            overlayContainer.innerHTML = '';
-            canvasItems.forEach(item => {
-                const img = document.createElement('img');
-                img.src = item.image;
-                img.className = `clothing-item ${selectedItemId === item.instanceId ? 'selected' : ''}`;
-                img.style.left = item.x + 'px';
-                img.style.top = item.y + 'px';
-                img.style.transform = `scale(${item.scale}) rotate(${item.rotate}deg)`;
-                img.style.zIndex = item.zIndex;
-                img.style.width = '140px';
-
-                enableDrag(img, item);
-
-                img.onclick = (e) => {
-                    e.stopPropagation();
-                    selectCanvasItem(item.instanceId);
-                };
-
-                overlayContainer.appendChild(img);
-            });
-
-            updateControlsBarUI();
-        }
-
-        function selectCanvasItem(instanceId) {
-            selectedItemId = instanceId;
-            renderCanvasItems();
-        }
-
-        function enableDrag(element, item) {
-            let isDragging = false;
-            let startX, startY;
-
-            const start = (e) => {
-                isDragging = true;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                startX = clientX - item.x;
-                startY = clientY - item.y;
-                selectCanvasItem(item.instanceId);
-            };
-
-            const move = (e) => {
-                if (!isDragging) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                item.x = clientX - startX;
-                item.y = clientY - startY;
-                element.style.left = item.x + 'px';
-                element.style.top = item.y + 'px';
-            };
-
-            const end = () => { isDragging = false; };
-
-            element.addEventListener('mousedown', start);
-            window.addEventListener('mousemove', move);
-            window.addEventListener('mouseup', end);
-
-            element.addEventListener('touchstart', start);
-            window.addEventListener('touchmove', move);
-            window.addEventListener('touchend', end);
-        }
-
-        // CONTROLES DE AJUSTE DA ROUPA
-        rangeScale.addEventListener('input', (e) => {
-            const item = canvasItems.find(i => i.instanceId === selectedItemId);
-            if (item) {
-                item.scale = parseFloat(e.target.value);
-                renderCanvasItems();
-            }
-        });
-
-        rangeRotate.addEventListener('input', (e) => {
-            const item = canvasItems.find(i => i.instanceId === selectedItemId);
-            if (item) {
-                item.rotate = parseInt(e.target.value);
-                renderCanvasItems();
-            }
-        });
-
-        btnLayerUp.addEventListener('click', () => {
-            const item = canvasItems.find(i => i.instanceId === selectedItemId);
-            if (item) {
-                item.zIndex += 1;
-                renderCanvasItems();
-            }
-        });
-
-        btnLayerDown.addEventListener('click', () => {
-            const item = canvasItems.find(i => i.instanceId === selectedItemId);
-            if (item && item.zIndex > 1) {
-                item.zIndex -= 1;
-                renderCanvasItems();
-            }
-        });
-
-        btnDeleteItem.addEventListener('click', () => {
-            canvasItems = canvasItems.filter(i => i.instanceId !== selectedItemId);
-            selectedItemId = null;
-            renderCanvasItems();
-        });
-
+        // Limpa todas as roupas do provador
         btnClearCanvas.addEventListener('click', () => {
-            canvasItems = [];
-            selectedItemId = null;
-            renderCanvasItems();
+            overlayContainer.innerHTML = '';
         });
 
-        function updateControlsBarUI() {
-            const selected = canvasItems.find(i => i.instanceId === selectedItemId);
-            if (selected) {
-                controlsBar.classList.remove('opacity-50', 'pointer-events-none');
-                rangeScale.value = selected.scale;
-                rangeRotate.value = selected.rotate;
-            } else {
-                controlsBar.classList.add('opacity-50', 'pointer-events-none');
+        // Quando o usuário seleciona uma imagem de roupa
+        clothingUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                // Remove a mensagem de "vazio" se for a primeira peça
+                if (clothingList.querySelector('.col-span-3')) {
+                    clothingList.innerHTML = '';
+                }
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const imgSrc = event.target.result;
+                    
+                    // A. Adiciona miniatura na lista de peças (Closet)
+                    const thumb = document.createElement('img');
+                    thumb.src = imgSrc;
+                    thumb.className = 'clothing-thumb';
+                    thumb.title = 'Clique para experimentar';
+                    
+                    // B. Evento: Ao clicar na miniatura, adiciona a roupa no provador
+                    thumb.addEventListener('click', () => {
+                        addClothingToStage(imgSrc);
+                    });
+
+                    clothingList.appendChild(thumb);
+                };
+                reader.readAsDataURL(file);
             }
-        }
-
-        // --- SALVAR LOOKS ---
-        btnSaveLook.addEventListener('click', () => {
-            const title = inputLookTitle.value.trim() || 'Meu Look';
-            if (canvasItems.length === 0) {
-                alert('Adicione pelo menos uma peça para salvar o look!');
-                return;
-            }
-
-            savedLooks.unshift({
-                id: Date.now(),
-                title,
-                items: JSON.parse(JSON.stringify(canvasItems))
-            });
-
-            inputLookTitle.value = '';
-            renderSavedLooks();
-            alert('Look salvo!');
         });
 
-        function renderSavedLooks() {
-            listLooks.innerHTML = '';
-            if (savedLooks.length === 0) {
-                listLooks.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">Nenhum look salvo.</p>';
-                return;
-            }
+        // Função para colocar a roupa sobre o corpo e permitir arrastar
+        function addClothingToStage(src) {
+            const item = document.createElement('img');
+            item.src = src;
+            item.className = 'overlay-item';
+            
+            // Posição inicial padrão (centro do palco)
+            item.style.top = '150px';
+            item.style.left = '150px';
+            // Largura padrão inicial da peça
+            item.style.width = '150px'; 
 
-            savedLooks.forEach(look => {
-                const item = document.createElement('div');
-                item.className = 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl flex items-center justify-between';
-                item.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-xs">${look.title}</h4>
-                        <span class="text-[10px] text-slate-400">${look.items.length} peças</span>
-                    </div>
-                    <button onclick="loadLook(${look.id})" class="px-2.5 py-1 bg-purple-600 text-white rounded-lg text-xs font-semibold">Usar</button>
-                `;
-                listLooks.appendChild(item);
+            // Torna a imagem arrastável
+            makeDraggable(item);
+
+            // Adiciona opção de remover com clique duplo
+            item.addEventListener('dblclick', () => {
+                item.remove();
             });
+            item.title = 'Arraste para posicionar. Clique duplo para remover.';
+
+            overlayContainer.appendChild(item);
         }
 
-        function loadLook(id) {
-            const look = savedLooks.find(l => l.id === id);
-            if (look) {
-                canvasItems = JSON.parse(JSON.stringify(look.items));
-                selectedItemId = null;
-                renderCanvasItems();
+
+        // --- 5. LÓGICA DE ARRASTAR E SOLTAR (DRAG & DROP) ---
+        // Suporta Mouse e Touch (Celular)
+        function makeDraggable(element) {
+            let isDragging = false;
+            let currentX;
+            let currentY;
+            let initialX;
+            let initialY;
+            let xOffset = 0;
+            let yOffset = 0;
+
+            const stage = document.getElementById('stage-canvas');
+
+            // Eventos de Mouse
+            element.addEventListener('mousedown', dragStart);
+            stage.addEventListener('mousemove', drag);
+            stage.addEventListener('mouseup', dragEnd);
+            stage.addEventListener('mouseleave', dragEnd); // Garante que para se sair do palco
+
+            // Eventos de Touch (Celular)
+            element.addEventListener('touchstart', dragStart, { passive: false });
+            stage.addEventListener('touchmove', drag, { passive: false });
+            stage.addEventListener('touchend', dragEnd);
+
+            // Recupera posição inicial da peça se ela já foi movida antes (para quando renderizar de novo)
+            if (element.style.left && element.style.top) {
+                xOffset = parseInt(element.style.left);
+                yOffset = parseInt(element.style.top);
+            }
+
+            function dragStart(e) {
+                // Impede comportamento padrão (como scroll no celular)
+                if (e.type === 'touchstart') {
+                    // e.preventDefault(); 
+                    initialX = e.touches[0].clientX - xOffset;
+                    initialY = e.touches[0].clientY - yOffset;
+                } else {
+                    initialX = e.clientX - xOffset;
+                    initialY = e.clientY - yOffset;
+                }
+
+                if (e.target === element) {
+                    isDragging = true;
+                    element.classList.add('dragging');
+                    // Traz a peça para a frente (z-index maior que as outras)
+                    bringToFront(element);
+                }
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault(); // Impede scroll no celular enquanto arrasta
+
+                    if (e.type === 'touchmove') {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
+
+                    xOffset = currentX;
+                    yOffset = currentY;
+
+                    setTranslate(currentX, currentY, element);
+                }
+            }
+
+            function dragEnd(e) {
+                initialX = currentX;
+                initialY = currentY;
+
+                isDragging = false;
+                element.classList.remove('dragging');
+            }
+
+            function setTranslate(xPos, yPos, el) {
+                el.style.left = xPos + 'px';
+                el.style.top = yPos + 'px';
+            }
+            
+            // Função auxiliar para trazer a peça clicada para frente
+            function bringToFront(el) {
+                const items = overlayContainer.querySelectorAll('.overlay-item');
+                // Reseta z-index de todos
+                items.forEach(item => item.style.zIndex = '10');
+                // Define z-index alto para o atual
+                el.style.zIndex = '20';
             }
         }
-
-        // --- ABAS DO CLOSET ---
-        const tabClothes = document.getElementById('tab-clothes');
-        const tabLooks = document.getElementById('tab-looks');
-        const contentClothes = document.getElementById('content-clothes');
-        const contentLooks = document.getElementById('content-looks');
-
-        tabClothes.onclick = () => {
-            tabClothes.className = "flex-1 py-2 text-xs font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400";
-            tabLooks.className = "flex-1 py-2 text-xs font-semibold text-slate-400 border-b-2 border-transparent";
-            contentClothes.classList.remove('hidden');
-            contentLooks.classList.add('hidden');
-        };
-
-        tabLooks.onclick = () => {
-            tabLooks.className = "flex-1 py-2 text-xs font-bold border-b-2 border-purple-600 text-purple-600 dark:text-purple-400";
-            tabClothes.className = "flex-1 py-2 text-xs font-semibold text-slate-400 border-b-2 border-transparent";
-            contentLooks.classList.remove('hidden');
-            contentClothes.classList.add('hidden');
-        };
-
-        // INICIALIZAÇÃO
-        renderClothesGrid();
-        renderSavedLooks();
     </script>
 </body>
 </html>
